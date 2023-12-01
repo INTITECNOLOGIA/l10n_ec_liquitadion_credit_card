@@ -129,6 +129,8 @@ class AccountCreditCardLiquidation(models.Model):
     percentage_ret_rent = fields.Float(
         string="Rent Withhold Percent", readonly=True, states=_STATES_DOC, default=2
     )
+    tax_id_ret = fields.Many2one('account.tax', string='Impuesto Renta')
+    tax_id_vat = fields.Many2one('account.tax', string='Impuesto Iva')
     commission_wo_invoice = fields.Float(
         string="Commission without Invoice", readonly=True, states=_STATES_DOC
     )
@@ -483,12 +485,7 @@ class AccountCreditCardLiquidation(models.Model):
             # Se crea la retencion
             ret = retention_model.browse()
             if not liquidation.no_withhold:
-
-                amount = float(liquidation.percentage_ret_rent) * -1
-                group_tax = self.env['account.tax.group'].search([('l10n_ec_type', '=', 'withhold_income_sale')])
-                tax_ret = self.env['account.tax'].search([('real_amount', '=', amount),
-                                                      ('tax_group_id', 'in', group_tax.ids)], limit=1)
-
+                #todo crear retencion correctamente
                 retention = self.env['l10n_ec.wizard.account.withhold'].create({
                     'partner_id': liquidation.partner_id.id,
                     'date': liquidation.issue_date,
@@ -498,21 +495,27 @@ class AccountCreditCardLiquidation(models.Model):
                     "company_id": liquidation.company_id.id,
                 })
 
-                if liquidation.rent_base and liquidation.rent_withhold and liquidation.percentage_ret_rent:
+                if liquidation.rent_base and liquidation.rent_withhold and liquidation.tax_id_ret:
                     line_vals = {
                        # 'invoice_id': existing_moves.id,
-                        'tax_id': tax_ret.id,
+                        'tax_id': liquidation.tax_id_ret.id,
                         'base': liquidation.rent_base,
                         'amount': liquidation.rent_withhold,
                         'wizard_id': retention.id,
                     }
                     retention.withhold_line_ids.create(line_vals)
 
+                if liquidation.rent_base and liquidation.iva_withhold and liquidation.tax_id_vat:
+                    line_vals = {
+                       # 'invoice_id': existing_moves.id,
+                        'tax_id': liquidation.tax_id_vat.id,
+                        'base': liquidation.rent_base,
+                        'amount': liquidation.iva_withhold,
+                        'wizard_id': retention.id,
+                    }
+                    retention.withhold_line_ids.create(line_vals)
+
                 ret = retention.action_create_and_post_withhold()
-
-
-
-
 
             if not liquidation.no_invoice:
                 # Se trata de conciliar la factura
@@ -763,8 +766,8 @@ class AccountCreditCardLiquidationLine(models.Model):
 
     _name = "account.credit.card.liquidation.line"
 
-    recap_id = fields.Many2one(
-        comodel_name="account.payment.recap", string="Lote / RECAP"
+    recap_id = fields.Many2one(domain=[("amount_not_reconciled", ">", 0)], comodel_name="account.payment.recap",
+                               string="Lote / RECAP"
     )
 
     liquidation_id = fields.Many2one(
