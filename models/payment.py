@@ -7,6 +7,12 @@ from odoo.tools.translate import _
 _logger = logging.getLogger(__name__)
 
 
+class AccountJournal(models.Model):
+    _inherit = 'account.journal'
+
+    is_payment_tc = fields.Boolean('Es diario TC?')
+
+
 class AccountCreditCardAuthorizer(models.Model):
     _name = "account.credit.card.authorizer"
 
@@ -171,8 +177,69 @@ _PAYMENT_STATES = {
 }
 
 
+class AccountPaymentRegister(models.TransientModel):
+    _inherit = 'account.payment.register'
+
+    is_payment_tc = fields.Boolean(related='journal_id.is_payment_tc', store=True)
+
+    l10n_ec_recap_id = fields.Many2one(
+        "account.payment.recap", "Batch / RECAP", ondelete="restrict"
+    )
+    l10n_ec_authorization_cc = fields.Char(
+        "Credit Card Authorization Number"
+    )
+    l10n_ec_authorizer_id = fields.Many2one(
+        "account.credit.card.authorizer",
+        "Authorizer"
+    )
+    l10n_ec_issuer_id = fields.Many2one(
+        "account.credit.card.issuer",
+        "Credit Card Issuer"
+    )
+    l10n_ec_credit_card_bank_id = fields.Many2one(
+        "res.bank",
+        "Credit Card Bank Issuer",
+        ondelete="restrict",
+    )
+    l10n_ec_voucher_type = fields.Selection(
+        [
+            ("automatic", "Automatic"),
+            ("manual", "Manual"),
+        ],
+        string="Voucher Type",
+        default="automatic"
+    )
+    l10n_ec_voucher_number = fields.Char(
+        "Voucher Number", required=False
+    )
+    l10n_ec_voucher_batch_number = fields.Char(
+        "# Batch/RECAP", required=False
+    )
+    l10n_ec_credit_card_number = fields.Char(
+        "Last Credit Card Numbers",
+        size=4,
+        required=False
+    )
+
+    def _create_payment_vals_from_wizard(self, batch_result):
+        # OVERRIDE
+        payment_vals = super()._create_payment_vals_from_wizard(batch_result)
+        payment_vals['l10n_ec_recap_id'] = self.l10n_ec_recap_id.id
+        payment_vals['l10n_ec_authorization_cc'] = self.l10n_ec_authorization_cc
+        payment_vals['l10n_ec_authorizer_id'] = self.l10n_ec_authorizer_id.id
+        payment_vals['l10n_ec_issuer_id'] = self.l10n_ec_issuer_id.id
+        payment_vals['l10n_ec_credit_card_bank_id'] = self.l10n_ec_credit_card_bank_id.id
+        payment_vals['l10n_ec_voucher_type'] = self.l10n_ec_voucher_type
+        payment_vals['l10n_ec_voucher_number'] = self.l10n_ec_voucher_number
+        payment_vals['l10n_ec_voucher_batch_number'] = self.l10n_ec_voucher_batch_number
+        payment_vals['l10n_ec_credit_card_number'] = self.l10n_ec_credit_card_number
+        return payment_vals
+
+
 class AccountPayment(models.Model):
     _inherit = "account.payment"
+
+    is_payment_tc = fields.Boolean(related='journal_id.is_payment_tc', store=True)
 
     l10n_ec_recap_id = fields.Many2one(
         "account.payment.recap", "Batch / RECAP", readonly=True, ondelete="restrict"
@@ -227,7 +294,7 @@ class AccountPayment(models.Model):
         self.action_create_recap()
         res = super(AccountPayment, self).action_post()
         for payment in self:
-            if payment.payment_is_tc and payment.move_id:
+            if payment.is_payment_tc and payment.move_id:
                 for line in payment.move_id.line_ids:
                     line.write(
                         {
@@ -241,7 +308,7 @@ class AccountPayment(models.Model):
     def action_create_recap(self):
         recap_model = self.env["account.payment.recap"].sudo()
         for payment in self:
-            if payment.payment_is_tc:
+            if payment.is_payment_tc:
                 batch = payment.l10n_ec_voucher_batch_number
                 recap = recap_model.search(
                     [
