@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record model="ir.ui.view" id="account_payment_recap_tree_view">
+        <field name="name">account.payment.recap.tree</field>
+        <field name="model">account.payment.recap</field>
+        <field name="arch" type="xml">
+            <tree create="0">
+                <field name="name" />
+                <field name="bank_id" />
+                <field name="date" />
+                <field name="amount_total" />
+                <field name="amount_not_reconciled" />
+            </tree>
+        </field>
+    </record>
+    <record model="ir.ui.view" id="account_payment_recap_form_view">
+        <field name="name">account.payment.recap.form</field>
+        <field name="model">account.payment.recap</field>
+        <field name="arch" type="xml">
+            <form create="0">
+                <header>
+                    <field
+                        name="state"
+                        widget="statusbar"
+                        statusbar_visible="draft,done"
+                    />
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" />
+                        <h1>
+                            <field name="name" />
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="bank_id" />
+                            <field name="date" />
+                            <field name="amount_total" />
+                            <field name="amount_not_reconciled" />
+                            <field name="authorizer_id" />
+                        </group>
+                        <group>
+                            <field name="create_uid" />
+                            <field name="create_date" />
+<!--                            <field name="printer_id" />-->
+<!--                            <field name="shop_id" />-->
+                        </group>
+                    </group>
+                    <notebook colspan="4">
+                        <page string="Payments">
+                            <field name="payment_line_ids" colspan="4" />
+                        </page>
+                        <page string="Lines Conciled">
+                            <field name="liquidation_line_ids" colspan="4" />
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record model="ir.ui.view" id="account_payment_recap_search_view">
+        <field name="name">account.payment.recap.search</field>
+        <field name="model">account.payment.recap</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" />
+                <field name="bank_id" />
+                <field name="date" />
+                <field name="create_uid" />
+<!--                <field name="printer_id" />-->
+<!--                <field name="shop_id" />-->
+                <filter
+                    string="Bank"
+                    domain="[]"
+                    name="bank_id"
+                    context="{'group_by':'bank_id'}"
+                />
+<!--                <filter-->
+<!--                    string="Point of emission"-->
+<!--                    domain="[]"-->
+<!--                    name="printer_id"-->
+<!--                    context="{'group_by':'printer_id'}"-->
+<!--                />-->
+<!--                <filter-->
+<!--                    string="Agency"-->
+<!--                    domain="[]"-->
+<!--                    name="shop_id"-->
+<!--                    context="{'group_by':'shop_id'}"-->
+<!--                />-->
+                <filter
+                    string="Create by"
+                    domain="[]"
+                    name="create_uid"
+                    context="{'group_by':'create_uid'}"
+                />
+                <filter
+                    string="Pending to concile"
+                    domain="[('state', '=', 'draft')]"
+                    name="state_draft"
+                />
+            </search>
+        </field>
+    </record>
+    <record model="ir.actions.act_window" id="action_account_payment_recap_tree_view">
+        <field name="name">Recap/Lotes TC</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">account.payment.recap</field>
+        <field name="context">{'search_default_state_draft': True}</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="account_payment_recap_tree_view" />
+    </record>
+    <menuitem
+        id="account_payment_recap_menu"
+        name="Recap/Lotes"
+        parent="account_credit_card_main_menu"
+        action="action_account_payment_recap_tree_view"
+        sequence="30"
+    />
+</odoo>

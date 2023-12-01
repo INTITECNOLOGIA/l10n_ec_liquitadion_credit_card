@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <template id="report_credit_card_liquidation">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <t t-foreach="docs" t-as="o">
+                    <div class="page">
+                        <h2 class="text-center">CREDIT CARD LIQUIDATION REPORT</h2>
+                        <h5 class="text-right">
+                            <span t-if="o.number != '/'">No.:</span>
+                            <span t-if="o.number != '/'" t-field="o.number"/>
+                        </h5>
+                        <br/>
+                        <table class="table table-condensed">
+                            <tr>
+                                <td>
+                                    <strong>SUPPLIER:</strong>
+                                    <p t-field="o.partner_id.name"/>
+                                </td>
+                                <td>
+                                    <strong>ACCOUNTING DATE:</strong>
+                                    <p t-field="o.date_account"/>
+                                </td>
+                            </tr>
+                        </table>
+                        <br/>
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Lot/ RECAP</th>
+                                    <th>Base</th>
+                                    <th>Commission</th>
+                                    <th>VAT commission</th>
+                                    <th>Rent Base</th>
+                                    <th>Rent Withhold</th>
+                                    <th>Iva Withhold</th>
+                                    <th>Net Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="o.line_ids" t-as="line">
+                                    <td>
+                                        <span t-esc="line.recap_id.display_name"/>
+                                    </td>
+                                    <td>
+                                        <span t-esc="line.base"/>
+                                    </td>
+                                    <td>
+                                        <span t-esc="line.commission"/>
+                                    </td>
+                                    <td>
+                                        <span t-esc="line.commission_iva"/>
+                                    </td>
+                                    <td>
+                                        <span t-esc="line.rent_base"/>
+                                    </td>
+                                    <td>
+                                        <span t-esc="line.rent_withhold"/>
+                                    </td>
+                                    <td>
+                                        <span t-esc="line.iva_withhold"/>
+                                    </td>
+                                    <td>
+                                        <span t-esc="line.net_value"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <!--
+                    Build your report here!
+                    Do it in awesome way ;)
+                    -->
+                        <p style="page-break-after:always;"/>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+
+</odoo>

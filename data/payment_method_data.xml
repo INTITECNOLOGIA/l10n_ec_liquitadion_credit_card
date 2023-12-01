@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data noupdate="0">
+        <record id="account_payment_method_tc_in" model="account.payment.method">
+            <field name="name">Credit Card</field>
+            <field name="code">tc</field>
+            <field name="payment_type">inbound</field>
+        </record>
+        <record id="issuer_america_express" model="account.credit.card.issuer">
+            <field name="name">AMERICAN EXPRESS</field>
+        </record>
+        <record id="issuer_diners_club" model="account.credit.card.issuer">
+            <field name="name">DINERS CLUB/DISCOVER</field>
+        </record>
+        <record id="issuer_mastercard" model="account.credit.card.issuer">
+            <field name="name">MASTERCARD</field>
+        </record>
+        <record id="issuer_visa" model="account.credit.card.issuer">
+            <field name="name">VISA</field>
+        </record>
+        <record id="issuer_other" model="account.credit.card.issuer">
+            <field name="name">OTRA TARJETA</field>
+        </record>
+    </data>
+</odoo>

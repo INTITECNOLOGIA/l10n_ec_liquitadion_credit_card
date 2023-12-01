@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data>
+        <record id="account_payment_form_view" model="ir.ui.view">
+            <field name="name">account.payment.form</field>
+            <field name="model">account.payment</field>
+            <field name="inherit_id" ref="account.view_account_payment_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='journal_id']" position="after">
+                    <field
+                            name="l10n_ec_recap_id"
+                            attrs="{'invisible': [('l10n_ec_recap_id', '=', False)]}"
+                    />
+                    <field
+                            name="l10n_ec_authorization_cc"
+                            attrs="{'invisible': [('payment_is_tc', '=', False)], 'required': [('payment_is_tc', '=', True)]}"
+                    />
+                    <field
+                            name="l10n_ec_authorizer_id"
+                            options="{'no_create': True}"
+                            attrs="{'invisible': [('payment_is_tc', '=', False)], 'required': [('payment_is_tc', '=', True)]}"
+                    />
+                    <field
+                            name="l10n_ec_issuer_id"
+                            options="{'no_create': True}"
+                            attrs="{'invisible': [('payment_is_tc', '=', False)], 'required': [('payment_is_tc', '=', True)]}"
+                    />
+                    <field
+                            name="l10n_ec_credit_card_bank_id"
+                            options="{'no_create': True}"
+                            attrs="{'invisible': [('payment_is_tc', '=', False)], 'required': [('payment_is_tc', '=', True)]}"
+                    />
+                    <field
+                            name="l10n_ec_voucher_type"
+                            attrs="{'invisible': [('payment_is_tc', '=', False)], 'required': [('payment_is_tc', '=', True)]}"
+                    />
+                    <field
+                            name="l10n_ec_voucher_number"
+                            attrs="{'invisible': [('payment_is_tc', '=', False)], 'required': [('payment_is_tc', '=', True)]}"
+                    />
+                    <field
+                            name="l10n_ec_voucher_batch_number"
+                            attrs="{'invisible': [('payment_is_tc', '=', False)], 'required': [('payment_is_tc', '=', True)]}"
+                    />
+                    <field
+                            name="l10n_ec_credit_card_number"
+                            password="1"
+                            attrs="{'invisible': [('payment_is_tc', '=', False)], 'required': [('payment_is_tc', '=', True)]}"
+                    />
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

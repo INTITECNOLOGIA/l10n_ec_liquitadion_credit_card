@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="account_credit_card_authorizer_form_view" model="ir.ui.view">
+        <field name="name">account.credit.card.authorizer.form</field>
+        <field name="model">account.credit.card.authorizer</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" />
+                        <h1>
+                            <field name="name" />
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="partner_id" />
+                        </group>
+                        <group>
+
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="account_credit_card_authorizer_tree_view" model="ir.ui.view">
+        <field name="name">account.credit.card.authorizer.tree</field>
+        <field name="model">account.credit.card.authorizer</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name" />
+                <field name="partner_id" />
+            </tree>
+        </field>
+    </record>
+    <record id="account_credit_card_authorizer_search_view" model="ir.ui.view">
+        <field name="name">account.credit.card.authorizer.search</field>
+        <field name="model">account.credit.card.authorizer</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" />
+            </search>
+        </field>
+    </record>
+    <record
+        id="account_credit_card_authorizer_act_window"
+        model="ir.actions.act_window"
+    >
+        <field name="name">Credit Card Authorizer</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">account.credit.card.authorizer</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    <menuitem
+        name="Authorizer"
+        id="account_credit_card_authorizer_menu"
+        parent="account_credit_card_main_menu"
+        action="account_credit_card_authorizer_act_window"
+        sequence="100"
+        groups="base.group_system"
+    />
+</odoo>
