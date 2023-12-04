@@ -7,14 +7,14 @@
             <form>
                 <sheet>
                     <div class="oe_title">
-                        <label for="name" />
+                        <label for="name"/>
                         <h1>
-                            <field name="name" />
+                            <field name="name"/>
                         </h1>
                     </div>
                     <group>
                         <group>
-                            <field name="partner_id" />
+                            <field name="partner_id"/>
                         </group>
                         <group>
 
@@ -29,8 +29,8 @@
         <field name="model">account.credit.card.authorizer</field>
         <field name="arch" type="xml">
             <tree>
-                <field name="name" />
-                <field name="partner_id" />
+                <field name="name"/>
+                <field name="partner_id"/>
             </tree>
         </field>
     </record>
@@ -39,13 +39,13 @@
         <field name="model">account.credit.card.authorizer</field>
         <field name="arch" type="xml">
             <search>
-                <field name="name" />
+                <field name="name"/>
             </search>
         </field>
     </record>
     <record
-        id="account_credit_card_authorizer_act_window"
-        model="ir.actions.act_window"
+            id="account_credit_card_authorizer_act_window"
+            model="ir.actions.act_window"
     >
         <field name="name">Credit Card Authorizer</field>
         <field name="type">ir.actions.act_window</field>
@@ -53,11 +53,11 @@
         <field name="view_mode">tree,form</field>
     </record>
     <menuitem
-        name="Authorizer"
-        id="account_credit_card_authorizer_menu"
-        parent="account_credit_card_main_menu"
-        action="account_credit_card_authorizer_act_window"
-        sequence="100"
-        groups="base.group_system"
+            name="Authorizer"
+            id="account_credit_card_authorizer_menu"
+            parent="account_credit_card_main_menu"
+            action="account_credit_card_authorizer_act_window"
+            sequence="100"
+            groups="base.group_system"
     />
 </odoo>

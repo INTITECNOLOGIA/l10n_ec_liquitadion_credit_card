@@ -105,12 +105,12 @@ class AccountPaymentRecap(models.Model):
             amount_total = 0.0
             amount_not_reconciled = 0.0
             for payment in rec.payment_line_ids.filtered(
-                lambda x: x.state not in ("draft", "cancel")
+                    lambda x: x.state not in ("draft", "cancel")
             ):
                 amount_total += payment.amount
                 amount_not_reconciled += payment.amount
             for line in rec.liquidation_line_ids.filtered(
-                lambda x: x.liquidation_id.state == "done"
+                    lambda x: x.liquidation_id.state == "done"
             ):
                 amount_not_reconciled -= line.base
             rec.amount_total = amount_total
@@ -299,8 +299,8 @@ class AccountPayment(models.Model):
                     line.write(
                         {
                             "name": line.name
-                            + " Recap "
-                            + payment.l10n_ec_voucher_batch_number
+                                    + " Recap "
+                                    + payment.l10n_ec_voucher_batch_number
                         }
                     )
         return res
@@ -334,7 +334,7 @@ class AccountPayment(models.Model):
             "company_id": self.company_id.id,
             "name": batch,
             "bank_id": self.l10n_ec_credit_card_bank_id.id,
-            "date": self.payment_date,
+            "date": self.date,
             "authorizer_id": self.l10n_ec_authorizer_id.id,
             "state": "draft",
         }

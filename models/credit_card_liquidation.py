@@ -12,7 +12,6 @@ _STATES_DOC = {"draft": [("readonly", False)]}
 
 
 class AccountCreditCardLiquidation(models.Model):
-
     _name = "account.credit.card.liquidation"
     _description = "account.credit.card.liquidation"
 
@@ -67,7 +66,8 @@ class AccountCreditCardLiquidation(models.Model):
         states=_STATES_DOC,
     )
 
-    journal_ret_id = fields.Many2one('account.journal', string="Diario", domain=[("l10n_ec_withhold_type", "=", "out_withhold")])
+    journal_ret_id = fields.Many2one('account.journal', string="Diario",
+                                     domain=[("l10n_ec_withhold_type", "=", "out_withhold")])
 
     date_account = fields.Date(
         string="Accounting Date",
@@ -173,6 +173,7 @@ class AccountCreditCardLiquidation(models.Model):
         readonly=True,
         states=_STATES_DOC,
     )
+
     # analytic_tag_ids = fields.Many2many(
     #     comodel_name="account.analytic.tag",
     #     string="Analytic Tags",
@@ -233,12 +234,12 @@ class AccountCreditCardLiquidation(models.Model):
                 liquidation.additional_lines_ids.mapped("rent_withhold")
             )
             net_value = (
-                sum(
-                    liquidation.line_ids.filtered(lambda x: not x.skip_payment).mapped(
-                        "net_value"
+                    sum(
+                        liquidation.line_ids.filtered(lambda x: not x.skip_payment).mapped(
+                            "net_value"
+                        )
                     )
-                )
-                - liquidation.commission_wo_invoice
+                    - liquidation.commission_wo_invoice
             )
             net_value += sum(liquidation.additional_lines_ids.mapped("net_value"))
             liquidation.base = base
@@ -359,14 +360,14 @@ class AccountCreditCardLiquidation(models.Model):
         domain = {}
         warning = {}
         issue_date = (
-            self.issue_date and self.issue_date or fields.Date.context_today(self)
+                self.issue_date and self.issue_date or fields.Date.context_today(self)
         )
         document_number = self.document_number
         # Si es electronico no deberia validar fechas ni nada
         if (
-            self.document_type
-            and self.document_type == "electronic"
-            or not self.partner_id
+                self.document_type
+                and self.document_type == "electronic"
+                or not self.partner_id
         ):
             return {"value": value, "domain": domain, "warning": warning}
         # Si se ha ingrasado los dos datos y estos han cambiado,
@@ -404,9 +405,9 @@ class AccountCreditCardLiquidation(models.Model):
             if not liquidation.line_ids:
                 raise UserError(_("Debe al menos ingresar una línea"))
             if (
-                not liquidation.invoice_id
-                and not liquidation.line_invoice_ids
-                and not liquidation.no_invoice
+                    not liquidation.invoice_id
+                    and not liquidation.line_invoice_ids
+                    and not liquidation.no_invoice
             ):
                 raise UserError(
                     _(
@@ -416,9 +417,9 @@ class AccountCreditCardLiquidation(models.Model):
                     )
                 )
             if (
-                liquidation.invoice_id
-                and liquidation.line_invoice_ids
-                and not liquidation.no_invoice
+                    liquidation.invoice_id
+                    and liquidation.line_invoice_ids
+                    and not liquidation.no_invoice
             ):
                 raise UserError(
                     _(
@@ -458,16 +459,16 @@ class AccountCreditCardLiquidation(models.Model):
                     "amls_to_concile": [],
                 }
             total_comission = (liquidation.commission_iva or 0.0) + (
-                liquidation.commission + 0.0
+                    liquidation.commission + 0.0
             )
             if multi_invoice:
                 total_to_concile = sum(
                     [v["amount_to_concile"] for v in invoice_to_liquidate.values()]
                 )
                 if (
-                    float_compare(total_to_concile, total_comission, precision_digits=2)
-                    != 0
-                    and not liquidation.no_invoice
+                        float_compare(total_to_concile, total_comission, precision_digits=2)
+                        != 0
+                        and not liquidation.no_invoice
                 ):
                     raise UserError(
                         _(
@@ -477,19 +478,19 @@ class AccountCreditCardLiquidation(models.Model):
                         % (
                             total_to_concile,
                             (
-                                (liquidation.commission_iva or 0.0)
-                                + (liquidation.commission + 0.0)
+                                    (liquidation.commission_iva or 0.0)
+                                    + (liquidation.commission + 0.0)
                             ),
                         )
                     )
             # Se crea la retencion
             ret = retention_model.browse()
             if not liquidation.no_withhold:
-                #todo crear retencion correctamente
+                # todo crear retencion correctamente
                 retention = self.env['l10n_ec.wizard.account.withhold'].create({
                     'partner_id': liquidation.partner_id.id,
                     'date': liquidation.issue_date,
-                   # 'related_invoice_ids': [(6, 0, [existing_moves.id])],
+                    # 'related_invoice_ids': [(6, 0, [existing_moves.id])],
                     'journal_id': liquidation.journal_ret_id.id,
                     'document_number': liquidation.document_number,
                     "company_id": liquidation.company_id.id,
@@ -497,7 +498,7 @@ class AccountCreditCardLiquidation(models.Model):
 
                 if liquidation.rent_base and liquidation.rent_withhold and liquidation.tax_id_ret:
                     line_vals = {
-                       # 'invoice_id': existing_moves.id,
+                        # 'invoice_id': existing_moves.id,
                         'tax_id': liquidation.tax_id_ret.id,
                         'base': liquidation.rent_base,
                         'amount': liquidation.rent_withhold,
@@ -507,7 +508,7 @@ class AccountCreditCardLiquidation(models.Model):
 
                 if liquidation.rent_base and liquidation.iva_withhold and liquidation.tax_id_vat:
                     line_vals = {
-                       # 'invoice_id': existing_moves.id,
+                        # 'invoice_id': existing_moves.id,
                         'tax_id': liquidation.tax_id_vat.id,
                         'base': liquidation.rent_base,
                         'amount': liquidation.iva_withhold,
@@ -523,10 +524,10 @@ class AccountCreditCardLiquidation(models.Model):
                     invoice = invoice_model.browse(invoice_id)
                     for line in invoice.line_ids:
                         if (
-                            line.account_id.account_type
-                            in ["asset_receivable", "liability_payable"]
-                            and line.partner_id
-                            and line.partner_id.id == invoice.partner_id.id
+                                line.account_id.account_type
+                                in ["asset_receivable", "liability_payable"]
+                                and line.partner_id
+                                and line.partner_id.id == invoice.partner_id.id
                         ):
                             invoice_to_liquidate[invoice_id]["amls_to_concile"].append(
                                 line.id
@@ -555,7 +556,7 @@ class AccountCreditCardLiquidation(models.Model):
             )
             if liquidation.base:
                 base = liquidation.base - (
-                    liquidation.iva_withhold + liquidation.rent_withhold
+                        liquidation.iva_withhold + liquidation.rent_withhold
                 )
                 if liquidation.no_withhold:
                     base = liquidation.base
@@ -583,14 +584,14 @@ class AccountCreditCardLiquidation(models.Model):
             if liquidation.commission or liquidation.commission_iva:
                 for invoice_id in invoice_to_liquidate.keys():
                     amount_line = (liquidation.commission_iva or 0.0) + (
-                        liquidation.commission + 0.0
+                            liquidation.commission + 0.0
                     )
                     if multi_invoice:
                         amount_line = invoice_to_liquidate[invoice_id].get(
                             "amount_to_concile", 0.0
                         )
                     name = (
-                        "Comision Liquidación TC %s" % (number_liquidation) + name_recap
+                            "Comision Liquidación TC %s" % (number_liquidation) + name_recap
                     )
                     aml = aml_model.with_context(check_move_validity=False).create(
                         liquidation._prepare_move_line_vals(
@@ -628,8 +629,8 @@ class AccountCreditCardLiquidation(models.Model):
                 payment_account_id = pmls.payment_account_id[:1] or default_payment_account
 
                 name = (
-                    _("Valor Neto Liquidación TC %s") % (number_liquidation)
-                    + name_recap
+                        _("Valor Neto Liquidación TC %s") % (number_liquidation)
+                        + name_recap
                 )
                 aml_model.with_context(check_move_validity=False).create(
                     liquidation._prepare_move_line_vals(
@@ -696,14 +697,14 @@ class AccountCreditCardLiquidation(models.Model):
         return True
 
     def _prepare_move_line_vals(
-        self, move, account, name, debit=0, credit=0, partner=False
+            self, move, account, name, debit=0, credit=0, partner=False
     ):
         return {
             "move_id": move.id,
             "account_id": account.id,
             "name": name,
             "analytic_distribution": self.account_analytic_id.id,
-            #"analytic_tag_ids": [(6, 0, self.analytic_tag_ids.ids)],
+            # "analytic_tag_ids": [(6, 0, self.analytic_tag_ids.ids)],
             "debit": debit,
             "credit": credit,
             "partner_id": partner.id if partner else False,
@@ -754,21 +755,20 @@ class AccountCreditCardLiquidation(models.Model):
             if rec.invoice_id.state == "open":
                 for aml in rec.move_ids:
                     if (
-                        aml.partner_id.commercial_partner_id.id
-                        == rec.invoice_id.commercial_partner_id.id
-                        and rec.invoice_id.account_id.id == aml.account_id.id
-                        and aml.amount_residual != 0
+                            aml.partner_id.commercial_partner_id.id
+                            == rec.invoice_id.commercial_partner_id.id
+                            and rec.invoice_id.account_id.id == aml.account_id.id
+                            and aml.amount_residual != 0
                     ):
                         rec.invoice_id.register_payment(aml)
 
 
 class AccountCreditCardLiquidationLine(models.Model):
-
     _name = "account.credit.card.liquidation.line"
 
     recap_id = fields.Many2one(domain=[("amount_not_reconciled", ">", 0)], comodel_name="account.payment.recap",
                                string="Lote / RECAP"
-    )
+                               )
 
     liquidation_id = fields.Many2one(
         comodel_name="account.credit.card.liquidation",
@@ -795,10 +795,10 @@ class AccountCreditCardLiquidationLine(models.Model):
     def _compute_net_value(self):
         for rec in self:
             rec.net_value = rec.base - (
-                rec.commission
-                + rec.commission_iva
-                + rec.iva_withhold
-                + rec.rent_withhold
+                    rec.commission
+                    + rec.commission_iva
+                    + rec.iva_withhold
+                    + rec.rent_withhold
             )
 
     net_value = fields.Float(
@@ -821,17 +821,17 @@ class AccountCreditCardLiquidationLine(models.Model):
     def onchange_amounts(self):
         for rec in self:
             rec.net_value = rec.base - (
-                rec.commission
-                + rec.commission_iva
-                + rec.iva_withhold
-                + rec.rent_withhold
+                    rec.commission
+                    + rec.commission_iva
+                    + rec.iva_withhold
+                    + rec.rent_withhold
             )
             if (
-                rec.recap_id
-                and float_compare(
-                    rec.recap_id.amount_not_reconciled, self.base, precision_digits=2
-                )
-                == -1
+                    rec.recap_id
+                    and float_compare(
+                rec.recap_id.amount_not_reconciled, self.base, precision_digits=2
+            )
+                    == -1
             ):
                 return {
                     "warning": {
@@ -841,7 +841,7 @@ class AccountCreditCardLiquidationLine(models.Model):
                             "es superior al monto pendiente de conciliar %s "
                             "verifique y corrija le valor de ser necesario"
                         )
-                        % (rec.base, rec.recap_id.amount_not_reconciled),
+                                   % (rec.base, rec.recap_id.amount_not_reconciled),
                     }
                 }
 
@@ -855,7 +855,6 @@ class AccountCreditCardLiquidationLine(models.Model):
 
 
 class AccountCreditCardLiquidationInvoiceDetail(models.Model):
-
     _name = "account.credit.card.liquidation.invoice.detail"
 
     liquidation_id = fields.Many2one(

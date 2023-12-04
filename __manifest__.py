@@ -10,7 +10,7 @@
     ],
     "data": [
         "security/ir.model.access.csv",
-        #"security/security.xml",
+        # "security/security.xml",
         "data/payment_method_data.xml",
         "data/sequence_data.xml",
         "views/menu_root.xml",
