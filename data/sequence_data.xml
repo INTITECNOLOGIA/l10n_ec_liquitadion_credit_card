@@ -3,7 +3,7 @@
     <record id="credit_card_liquidation_sequence" model="ir.sequence">
         <field name="name">Liquidacion Tarjetas Credito</field>
         <field name="code">credit.card.liquidation</field>
-        <field eval="4" name="padding" />
+        <field eval="4" name="padding"/>
         <field name="prefix">LTC%(y)s%(month)s%(day)s</field>
     </record>
 </odoo>
