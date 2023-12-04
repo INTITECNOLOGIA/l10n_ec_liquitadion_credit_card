@@ -363,6 +363,8 @@ class AccountCreditCardLiquidation(models.Model):
                 self.issue_date and self.issue_date or fields.Date.context_today(self)
         )
         document_number = self.document_number
+        if self.document_number:
+            self.document_number = self.fill_with_zeros(self.document_number)
         # Si es electronico no deberia validar fechas ni nada
         if (
                 self.document_type
@@ -370,29 +372,15 @@ class AccountCreditCardLiquidation(models.Model):
                 or not self.partner_id
         ):
             return {"value": value, "domain": domain, "warning": warning}
-        # Si se ha ingrasado los dos datos y estos han cambiado,
-        # se debe verificar si siguen siendo validos
-        if self.document_number:
-            agency = None
-            printer_point = None
-            seq_number = None
-            try:
-                # Se verifica que no se haya ingresado un valor
-                # del tipo 00X-00X-000000XXX
-                split_number = self.document_number.split("-")
-            except Exception as e:
-                _logger.debug(
-                    _("Error parsing number of document: %s : %s")
-                    % (self.document_number, str(e))
-                )
-                # Se hace un entero para retirar los ceros
-                try:
-                    seq_number = int(self.document_number)
-                except Exception as e:
-                    _logger.debug(
-                        _("Error parsing number of document: %s : %s")
-                        % (self.document_number, str(e))
-                    )
+
+    def fill_with_zeros(self, input_number):
+        if input_number.count('-') < 2:
+            input_number = '1-1-' + input_number
+        parts = input_number.split('-')
+        filled_parts = [part.zfill(3) if i < len(parts) - 1 else part.zfill(9) for i, part in enumerate(parts)]
+
+        filled_number = '-'.join(filled_parts)
+        return filled_number
 
     def action_done(self):
         retention_model = self.env["account.move"]
