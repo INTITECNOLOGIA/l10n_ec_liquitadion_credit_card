@@ -47,6 +47,13 @@ class AccountCreditCardLiquidation(models.Model):
         readonly=True,
         states=_STATES_DOC,
     )
+    account_commission_id = fields.Many2one(
+        comodel_name="account.account",
+        string="Commission Account(CC)",
+        required=True,
+        readonly=True,
+        states=_STATES_DOC,
+    )
     journal_id = fields.Many2one(
         comodel_name="account.journal",
         string="Dest. Journal",
@@ -472,10 +479,7 @@ class AccountCreditCardLiquidation(models.Model):
                             ),
                         )
                     )
-            # Se crea la retencion
-            ret = retention_model.browse()
             if not liquidation.no_withhold:
-                # todo crear retencion correctamente
                 vals = self._prepare_withhold_header()
                 total_lines = self._prepare_withhold_move_lines()
                 vals['line_ids'] = [Command.create(vals) for vals in total_lines]
@@ -508,10 +512,9 @@ class AccountCreditCardLiquidation(models.Model):
                     "date": liquidation.date_account,
                 }
             )
-            if not liquidation.partner_id.property_account_payable_id:
+            if not liquidation.account_commission_id:
                 raise UserError(
-                    _("Debe configurar la cuenta contable por pagar del proveedor %s")
-                    % (liquidation.partner_id.name)
+                    _("Debe configurar la cuenta  de comiciones")
                 )
             # Si se va a saldar una factura deberia solo tomar el parcial
             # Valor de base que se debe sacar de la cuenta contable
@@ -531,7 +534,7 @@ class AccountCreditCardLiquidation(models.Model):
                         am,
                         liquidation.account_id,
                         name,
-                        credit=base,
+                        debit=base,
                         partner=liquidation.partner_id,
                     )
                 )
@@ -542,7 +545,7 @@ class AccountCreditCardLiquidation(models.Model):
                         am,
                         liquidation.account_commission_id,
                         name,
-                        debit=liquidation.commission_wo_invoice,
+                        credit=liquidation.commission_wo_invoice,
                         partner=liquidation.partner_id,
                     )
                 )
@@ -561,9 +564,9 @@ class AccountCreditCardLiquidation(models.Model):
                     aml = aml_model.with_context(check_move_validity=False).create(
                         liquidation._prepare_move_line_vals(
                             am,
-                            liquidation.partner_id.property_account_payable_id,
+                            liquidation.account_commission_id,
                             name,
-                            debit=amount_line,
+                            credit=amount_line,
                             partner=liquidation.partner_id,
                         )
                     )
@@ -582,7 +585,7 @@ class AccountCreditCardLiquidation(models.Model):
                             am,
                             payment_account_id,
                             name,
-                            debit=line.net_value,
+                            credit=line.net_value,
                             partner=liquidation.partner_id,
                         )
                     )
@@ -602,7 +605,7 @@ class AccountCreditCardLiquidation(models.Model):
                         am,
                         payment_account_id,
                         name,
-                        debit=liquidation.net_value,
+                        credit=liquidation.net_value,
                         partner=liquidation.partner_id,
                     )
                 )
@@ -613,7 +616,7 @@ class AccountCreditCardLiquidation(models.Model):
                         am,
                         liquidation.account_commission_expense_id,
                         name,
-                        debit=total_comission,
+                        credit=total_comission,
                         partner=liquidation.partner_id,
                     )
                 )
@@ -625,7 +628,7 @@ class AccountCreditCardLiquidation(models.Model):
                             am,
                             liquidation.account_withhold_rent_id,
                             name,
-                            debit=liquidation.rent_withhold,
+                            credit=liquidation.rent_withhold,
                             partner=liquidation.partner_id,
                         )
                     )
@@ -636,27 +639,24 @@ class AccountCreditCardLiquidation(models.Model):
                             am,
                             liquidation.account_withhold_iva_id,
                             name,
-                            debit=liquidation.iva_withhold,
+                            credit=liquidation.iva_withhold,
                             partner=liquidation.partner_id,
                         )
                     )
             am.action_post()
             if not liquidation.no_invoice and invoice_to_liquidate:
                 for invoice_id in invoice_to_liquidate.keys():
-                    aml_model.browse(
+                    aml_model_ids = aml_model.browse(
                         invoice_to_liquidate[invoice_id]["amls_to_concile"]
-                    ).reconcile()
+                    )
+                    for account_con_id in aml_model_ids.mapped('account_id'):
+                        aml_model_ids.filtered(lambda x: x.account_id == account_con_id).reconcile()
+
             update_data = {
                 "number": number_liquidation,
                 "move_id": am.id,
                 "state": "done",
             }
-            if ret:
-                update_data.update(
-                    {
-                        "withhold_id": ret.id,
-                    }
-                )
             liquidation.reconcile_invoice()
             liquidation.write(update_data)
         return True
@@ -732,7 +732,7 @@ class AccountCreditCardLiquidation(models.Model):
         }
         total_lines.append(vals_base_line)
 
-        account = self.partner_id.property_account_receivable_id
+        account = self.account_id
         amount = self.iva_withhold + self.rent_withhold
 
         vals = {
