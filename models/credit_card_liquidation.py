@@ -527,8 +527,7 @@ class AccountCreditCardLiquidation(models.Model):
                         liquidation.iva_withhold + liquidation.rent_withhold
                 )
                 amount_line = (liquidation.commission_iva or 0.0) + (
-                        liquidation.commission + 0.0
-                )
+                        liquidation.commission + 0.0)
 
                 name = "Base de Liquidación TC %s" % (number_liquidation) + name_recap
                 aml_model.with_context(check_move_validity=False).create(
@@ -604,7 +603,8 @@ class AccountCreditCardLiquidation(models.Model):
                 )
                 value = liquidation.base
                 if not liquidation.no_withhold:
-                    value = liquidation.net_value
+                    value = liquidation.net_value + (liquidation.commission_iva or 0.0) + (
+                            liquidation.commission + 0.0)
                 aml_model.with_context(check_move_validity=False).create(
                     liquidation._prepare_move_line_vals(
                         am,
@@ -736,13 +736,17 @@ class AccountCreditCardLiquidation(models.Model):
         }
         total_lines.append(vals_base_line)
 
-        account = self.account_id
+        pmls = self.journal_id.inbound_payment_method_line_ids
+        default_payment_account = self.company_id.account_journal_payment_debit_account_id
+
+        payment_account_id = pmls.payment_account_id[:1] or default_payment_account
+
         amount = self.iva_withhold + self.rent_withhold
 
         vals = {
             **self._get_move_line_default_values(amount, False),
             'name': _('Withhold on: %s') % self.number,
-            'account_id': account.id,
+            'account_id': payment_account_id.id,
         }
         total_lines.append(vals)
         return total_lines
