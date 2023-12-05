@@ -526,15 +526,17 @@ class AccountCreditCardLiquidation(models.Model):
                 base = liquidation.base - (
                         liquidation.iva_withhold + liquidation.rent_withhold
                 )
-                if liquidation.no_withhold:
-                    base = liquidation.base
+                amount_line = (liquidation.commission_iva or 0.0) + (
+                        liquidation.commission + 0.0
+                )
+
                 name = "Base de Liquidación TC %s" % (number_liquidation) + name_recap
                 aml_model.with_context(check_move_validity=False).create(
                     liquidation._prepare_move_line_vals(
                         am,
                         liquidation.account_id,
                         name,
-                        debit=base,
+                        debit=base - amount_line,
                         partner=liquidation.partner_id,
                     )
                 )
@@ -566,7 +568,7 @@ class AccountCreditCardLiquidation(models.Model):
                             am,
                             liquidation.account_commission_id,
                             name,
-                            credit=amount_line,
+                            debit=amount_line,
                             partner=liquidation.partner_id,
                         )
                     )
@@ -600,12 +602,15 @@ class AccountCreditCardLiquidation(models.Model):
                         _("Valor Neto Liquidación TC %s") % (number_liquidation)
                         + name_recap
                 )
+                value = liquidation.base
+                if not liquidation.no_withhold:
+                    value = liquidation.net_value
                 aml_model.with_context(check_move_validity=False).create(
                     liquidation._prepare_move_line_vals(
                         am,
                         payment_account_id,
                         name,
-                        credit=liquidation.net_value,
+                        credit=value,
                         partner=liquidation.partner_id,
                     )
                 )
@@ -628,7 +633,7 @@ class AccountCreditCardLiquidation(models.Model):
                             am,
                             liquidation.account_withhold_rent_id,
                             name,
-                            credit=liquidation.rent_withhold,
+                            debit=liquidation.rent_withhold,
                             partner=liquidation.partner_id,
                         )
                     )
@@ -639,7 +644,7 @@ class AccountCreditCardLiquidation(models.Model):
                             am,
                             liquidation.account_withhold_iva_id,
                             name,
-                            credit=liquidation.iva_withhold,
+                            debit=liquidation.iva_withhold,
                             partner=liquidation.partner_id,
                         )
                     )
