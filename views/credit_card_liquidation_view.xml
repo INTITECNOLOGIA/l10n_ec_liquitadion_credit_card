@@ -100,6 +100,7 @@
                         <field name="partner_id" options="{'no_create': True}"/>
                         <field name="date_account"/>
                         <field name="account_id" options="{'no_create': True}"/>
+                        <field name="account_commission_id" options="{'no_create': True}"/>
                         <field name="journal_id" domain="[('type', '=', 'bank')]" widget="selection"
                                options="{'no_create': True}"/>
 

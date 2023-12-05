@@ -1,7 +1,9 @@
 import logging
 import re
+import calendar
+from datetime import date
 
-from odoo import api, fields, models
+from odoo import api, fields, models, Command
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools import float_compare
 from odoo.tools.translate import _
@@ -41,6 +43,13 @@ class AccountCreditCardLiquidation(models.Model):
     account_id = fields.Many2one(
         comodel_name="account.account",
         string="Origin Account(CC)",
+        required=True,
+        readonly=True,
+        states=_STATES_DOC,
+    )
+    account_commission_id = fields.Many2one(
+        comodel_name="account.account",
+        string="Commission Account(CC)",
         required=True,
         readonly=True,
         states=_STATES_DOC,
@@ -378,7 +387,6 @@ class AccountCreditCardLiquidation(models.Model):
             input_number = '1-1-' + input_number
         parts = input_number.split('-')
         filled_parts = [part.zfill(3) if i < len(parts) - 1 else part.zfill(9) for i, part in enumerate(parts)]
-
         filled_number = '-'.join(filled_parts)
         return filled_number
 
@@ -471,40 +479,13 @@ class AccountCreditCardLiquidation(models.Model):
                             ),
                         )
                     )
-            # Se crea la retencion
-            ret = retention_model.browse()
             if not liquidation.no_withhold:
-                # todo crear retencion correctamente
-                retention = self.env['l10n_ec.wizard.account.withhold'].create({
-                    'partner_id': liquidation.partner_id.id,
-                    'date': liquidation.issue_date,
-                    # 'related_invoice_ids': [(6, 0, [existing_moves.id])],
-                    'journal_id': liquidation.journal_ret_id.id,
-                    'document_number': liquidation.document_number,
-                    "company_id": liquidation.company_id.id,
-                })
-
-                if liquidation.rent_base and liquidation.rent_withhold and liquidation.tax_id_ret:
-                    line_vals = {
-                        # 'invoice_id': existing_moves.id,
-                        'tax_id': liquidation.tax_id_ret.id,
-                        'base': liquidation.rent_base,
-                        'amount': liquidation.rent_withhold,
-                        'wizard_id': retention.id,
-                    }
-                    retention.withhold_line_ids.create(line_vals)
-
-                if liquidation.rent_base and liquidation.iva_withhold and liquidation.tax_id_vat:
-                    line_vals = {
-                        # 'invoice_id': existing_moves.id,
-                        'tax_id': liquidation.tax_id_vat.id,
-                        'base': liquidation.rent_base,
-                        'amount': liquidation.iva_withhold,
-                        'wizard_id': retention.id,
-                    }
-                    retention.withhold_line_ids.create(line_vals)
-
-                ret = retention.action_create_and_post_withhold()
+                vals = self._prepare_withhold_header()
+                total_lines = self._prepare_withhold_move_lines()
+                vals['line_ids'] = [Command.create(vals) for vals in total_lines]
+                withhold = self.env['account.move'].create(vals)
+                withhold.action_post()
+                self.withhold_id = withhold
 
             if not liquidation.no_invoice:
                 # Se trata de conciliar la factura
@@ -531,10 +512,9 @@ class AccountCreditCardLiquidation(models.Model):
                     "date": liquidation.date_account,
                 }
             )
-            if not liquidation.partner_id.property_account_payable_id:
+            if not liquidation.account_commission_id:
                 raise UserError(
-                    _("Debe configurar la cuenta contable por pagar del proveedor %s")
-                    % (liquidation.partner_id.name)
+                    _("Debe configurar la cuenta  de comiciones")
                 )
             # Si se va a saldar una factura deberia solo tomar el parcial
             # Valor de base que se debe sacar de la cuenta contable
@@ -546,15 +526,16 @@ class AccountCreditCardLiquidation(models.Model):
                 base = liquidation.base - (
                         liquidation.iva_withhold + liquidation.rent_withhold
                 )
-                if liquidation.no_withhold:
-                    base = liquidation.base
+                amount_line = (liquidation.commission_iva or 0.0) + (
+                        liquidation.commission + 0.0)
+
                 name = "Base de Liquidación TC %s" % (number_liquidation) + name_recap
                 aml_model.with_context(check_move_validity=False).create(
                     liquidation._prepare_move_line_vals(
                         am,
                         liquidation.account_id,
                         name,
-                        credit=base,
+                        debit=base - amount_line,
                         partner=liquidation.partner_id,
                     )
                 )
@@ -565,7 +546,7 @@ class AccountCreditCardLiquidation(models.Model):
                         am,
                         liquidation.account_commission_id,
                         name,
-                        debit=liquidation.commission_wo_invoice,
+                        credit=liquidation.commission_wo_invoice,
                         partner=liquidation.partner_id,
                     )
                 )
@@ -584,7 +565,7 @@ class AccountCreditCardLiquidation(models.Model):
                     aml = aml_model.with_context(check_move_validity=False).create(
                         liquidation._prepare_move_line_vals(
                             am,
-                            liquidation.partner_id.property_account_payable_id,
+                            liquidation.account_commission_id,
                             name,
                             debit=amount_line,
                             partner=liquidation.partner_id,
@@ -605,7 +586,7 @@ class AccountCreditCardLiquidation(models.Model):
                             am,
                             payment_account_id,
                             name,
-                            debit=line.net_value,
+                            credit=line.net_value,
                             partner=liquidation.partner_id,
                         )
                     )
@@ -620,12 +601,16 @@ class AccountCreditCardLiquidation(models.Model):
                         _("Valor Neto Liquidación TC %s") % (number_liquidation)
                         + name_recap
                 )
+                value = liquidation.base
+                if not liquidation.no_withhold:
+                    value = liquidation.net_value + (liquidation.commission_iva or 0.0) + (
+                            liquidation.commission + 0.0)
                 aml_model.with_context(check_move_validity=False).create(
                     liquidation._prepare_move_line_vals(
                         am,
                         payment_account_id,
                         name,
-                        debit=liquidation.net_value,
+                        credit=value,
                         partner=liquidation.partner_id,
                     )
                 )
@@ -636,82 +621,135 @@ class AccountCreditCardLiquidation(models.Model):
                         am,
                         liquidation.account_commission_expense_id,
                         name,
-                        debit=total_comission,
+                        credit=total_comission,
                         partner=liquidation.partner_id,
                     )
                 )
-            if liquidation.no_withhold:
-                if liquidation.rent_withhold > 0:
-                    name = "Retencion I.R. TC %s" % (number_liquidation) + name_recap
-                    aml_model.with_context(check_move_validity=False).create(
-                        liquidation._prepare_move_line_vals(
-                            am,
-                            liquidation.account_withhold_rent_id,
-                            name,
-                            debit=liquidation.rent_withhold,
-                            partner=liquidation.partner_id,
-                        )
+            if liquidation.no_withhold and liquidation.rent_withhold > 0:
+                name = "Retencion I.R. TC %s" % (number_liquidation) + name_recap
+                aml_model.with_context(check_move_validity=False).create(
+                    liquidation._prepare_move_line_vals(
+                        am,
+                        liquidation.account_withhold_rent_id,
+                        name,
+                        debit=liquidation.rent_withhold,
+                        partner=liquidation.partner_id,
                     )
-                if liquidation.iva_withhold > 0:
-                    name = "Retención I.V.A. TC %s" % (number_liquidation) + name_recap
-                    aml_model.with_context(check_move_validity=False).create(
-                        liquidation._prepare_move_line_vals(
-                            am,
-                            liquidation.account_withhold_iva_id,
-                            name,
-                            debit=liquidation.iva_withhold,
-                            partner=liquidation.partner_id,
-                        )
+                )
+            if liquidation.no_withhold and liquidation.iva_withhold > 0:
+                name = "Retención I.V.A. TC %s" % (number_liquidation) + name_recap
+                aml_model.with_context(check_move_validity=False).create(
+                    liquidation._prepare_move_line_vals(
+                        am,
+                        liquidation.account_withhold_iva_id,
+                        name,
+                        debit=liquidation.iva_withhold,
+                        partner=liquidation.partner_id,
                     )
+                )
             am.action_post()
             if not liquidation.no_invoice and invoice_to_liquidate:
                 for invoice_id in invoice_to_liquidate.keys():
-                    aml_model.browse(
+                    aml_model_ids = aml_model.browse(
                         invoice_to_liquidate[invoice_id]["amls_to_concile"]
-                    ).reconcile()
+                    )
+                    for account_con_id in aml_model_ids.mapped('account_id'):
+                        aml_model_ids.filtered(lambda x: x.account_id == account_con_id).reconcile()
+
             update_data = {
                 "number": number_liquidation,
                 "move_id": am.id,
                 "state": "done",
             }
-            if ret:
-                update_data.update(
-                    {
-                        "withhold_id": ret.id,
-                    }
-                )
             liquidation.reconcile_invoice()
             liquidation.write(update_data)
         return True
 
-    def _prepare_move_line_vals(
-            self, move, account, name, debit=0, credit=0, partner=False
-    ):
+    def _prepare_move_line_vals(self, move, account, name, debit=0, credit=0, partner=False):
         return {
             "move_id": move.id,
             "account_id": account.id,
             "name": name,
             "analytic_distribution": self.account_analytic_id.id,
-            # "analytic_tag_ids": [(6, 0, self.analytic_tag_ids.ids)],
             "debit": debit,
             "credit": credit,
             "partner_id": partner.id if partner else False,
         }
 
-    def _prepare_witholding_vals(self):
-        return {
-            "company_id": self.company_id.id,
-            "number": self.document_number,
-            "issue_date": self.issue_date,
-            "partner_id": self.partner_id.id,
-            "type": "credit_card",
-            "l10n_ec_credit_card_account_id": self.account_id.id,
-            "l10n_ec_credit_card_liquidation_id": self.id,
-            "state": "draft",
-            "document_type": self.document_type,
-            "electronic_authorization": self.electronic_authorization,
-            # "partner_authorization_id": self.authorization_id.id,
+    def _prepare_withhold_header(self):
+        vals = {
+            'date': self.date_account,
+            'l10n_ec_withhold_date': self.date_account,
+            'journal_id': self.journal_ret_id.id,
+            'partner_id': self.partner_id.id,
+            'move_type': 'entry',
+            'l10n_ec_withhold_foreign_regime': False,
+            'ref': f"Ret {self.document_number}",
         }
+        return vals
+
+    @api.model
+    def _tax_compute_all_helper(self, base, tax_id):
+        taxes_res = tax_id.compute_all(
+            base,
+            currency=tax_id.company_id.currency_id,
+            quantity=1.0,
+            product=False,
+            partner=False,
+            is_refund=False,
+        )
+        tax_amount = taxes_res['taxes'][0]['amount']
+        tax_amount = abs(tax_amount)  # For ignoring the sign of the percentage on tax configuration
+        tax_account_id = taxes_res['taxes'][0]['account_id']
+        return tax_amount, tax_account_id
+
+    def _get_move_line_default_values(self, price, debit):
+        return {
+            'partner_id': self.partner_id.commercial_partner_id.id,
+            'quantity': 1.0,
+            'price_unit': price,
+            'debit': price if debit else 0.0,
+            'credit': 0.0 if debit else price,
+            'tax_base_amount': 0.0,
+            'display_type': 'product',
+            'l10n_ec_withhold_invoice_id': False,
+            'l10n_ec_code_taxsupport': False,
+        }
+
+    def _prepare_withhold_move_lines(self):
+        total_lines = []
+
+        dummy, account = self._tax_compute_all_helper(1.0, self.tax_id_ret)
+        vals_base_line = {
+            **self._get_move_line_default_values(self.rent_withhold, True),
+            'name': 'Base Ret: ' + self.tax_id_ret.name,
+            'tax_ids': [Command.set(self.tax_id_ret.ids)],
+            'account_id': account,
+        }
+        total_lines.append(vals_base_line)
+        dummy, account = self._tax_compute_all_helper(1.0, self.tax_id_vat)
+        vals_base_line = {
+            **self._get_move_line_default_values(self.iva_withhold, True),
+            'name': 'Base Ret: ' + self.tax_id_vat.name,
+            'tax_ids': [Command.set(self.tax_id_vat.ids)],
+            'account_id': account,
+        }
+        total_lines.append(vals_base_line)
+
+        pmls = self.journal_id.inbound_payment_method_line_ids
+        default_payment_account = self.company_id.account_journal_payment_debit_account_id
+
+        payment_account_id = pmls.payment_account_id[:1] or default_payment_account
+
+        amount = self.iva_withhold + self.rent_withhold
+
+        vals = {
+            **self._get_move_line_default_values(amount, False),
+            'name': _('Withhold on: %s') % self.number,
+            'account_id': payment_account_id.id,
+        }
+        total_lines.append(vals)
+        return total_lines
 
     def action_cancel(self):
         for liquidation in self:
@@ -721,8 +759,8 @@ class AccountCreditCardLiquidation(models.Model):
                     liquidation.move_id.button_cancel()
                 liquidation.move_id.unlink()
             if liquidation.withhold_id:
-                liquidation.withhold_id.action_cancel()
-                liquidation.withhold_id.action_back_to_draft()
+                if liquidation.withhold_id.state == "posted":
+                    liquidation.withhold_id.button_cancel()
                 liquidation.withhold_id.unlink()
             liquidation.write({"state": "cancel"})
         return True
@@ -733,9 +771,7 @@ class AccountCreditCardLiquidation(models.Model):
     def unlink(self):
         for credit_card in self:
             if credit_card.state != "draft":
-                raise UserError(
-                    _("You can not delete credit card liquidation, try cancel first")
-                )
+                raise UserError(_("You can not delete a credit card liquidation, try canceling it first"))
         return super(AccountCreditCardLiquidation, self).unlink()
 
     def reconcile_invoice(self):
@@ -743,8 +779,7 @@ class AccountCreditCardLiquidation(models.Model):
             if rec.invoice_id.state == "open":
                 for aml in rec.move_ids:
                     if (
-                            aml.partner_id.commercial_partner_id.id
-                            == rec.invoice_id.commercial_partner_id.id
+                            aml.partner_id.commercial_partner_id.id == rec.invoice_id.commercial_partner_id.id
                             and rec.invoice_id.account_id.id == aml.account_id.id
                             and aml.amount_residual != 0
                     ):
