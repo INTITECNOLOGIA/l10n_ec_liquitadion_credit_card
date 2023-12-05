@@ -625,29 +625,28 @@ class AccountCreditCardLiquidation(models.Model):
                         partner=liquidation.partner_id,
                     )
                 )
-            if liquidation.no_withhold:
-                if liquidation.rent_withhold > 0:
-                    name = "Retencion I.R. TC %s" % (number_liquidation) + name_recap
-                    aml_model.with_context(check_move_validity=False).create(
-                        liquidation._prepare_move_line_vals(
-                            am,
-                            liquidation.account_withhold_rent_id,
-                            name,
-                            debit=liquidation.rent_withhold,
-                            partner=liquidation.partner_id,
-                        )
+            if liquidation.no_withhold and liquidation.rent_withhold > 0:
+                name = "Retencion I.R. TC %s" % (number_liquidation) + name_recap
+                aml_model.with_context(check_move_validity=False).create(
+                    liquidation._prepare_move_line_vals(
+                        am,
+                        liquidation.account_withhold_rent_id,
+                        name,
+                        debit=liquidation.rent_withhold,
+                        partner=liquidation.partner_id,
                     )
-                if liquidation.iva_withhold > 0:
-                    name = "Retención I.V.A. TC %s" % (number_liquidation) + name_recap
-                    aml_model.with_context(check_move_validity=False).create(
-                        liquidation._prepare_move_line_vals(
-                            am,
-                            liquidation.account_withhold_iva_id,
-                            name,
-                            debit=liquidation.iva_withhold,
-                            partner=liquidation.partner_id,
-                        )
+                )
+            if liquidation.no_withhold and liquidation.iva_withhold > 0:
+                name = "Retención I.V.A. TC %s" % (number_liquidation) + name_recap
+                aml_model.with_context(check_move_validity=False).create(
+                    liquidation._prepare_move_line_vals(
+                        am,
+                        liquidation.account_withhold_iva_id,
+                        name,
+                        debit=liquidation.iva_withhold,
+                        partner=liquidation.partner_id,
                     )
+                )
             am.action_post()
             if not liquidation.no_invoice and invoice_to_liquidate:
                 for invoice_id in invoice_to_liquidate.keys():
