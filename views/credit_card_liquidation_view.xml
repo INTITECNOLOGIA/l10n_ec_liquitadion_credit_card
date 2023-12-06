@@ -229,11 +229,13 @@
                                     />
                                     <field name="tax_id_ret"
                                            attrs="{'required': [('no_withhold', '=', False)], 'invisible': [('no_withhold', '=', True)]}"
-                                           options="{'no_create': True}"/>
+                                           options="{'no_create': True}"
+                                           domain="[('tax_group_id.l10n_ec_type', 'in', ['withhold_income_sale'])]"/>
 
                                     <field name="tax_id_vat"
                                            attrs="{'required': [('no_withhold', '=', False)], 'invisible': [('no_withhold', '=', True)]}"
-                                           options="{'no_create': True}"/>
+                                           options="{'no_create': True}"
+                                           domain="[('tax_group_id.l10n_ec_type', 'in', ['withhold_vat_sale'])]"/>
                                     <!--                                    <field-->
                                     <!--                                            name="percentage_ret_iva"-->
                                     <!--                                            attrs="{'required': [('no_withhold', '=', False)], 'invisible': [('no_withhold', '=', True)]}"-->

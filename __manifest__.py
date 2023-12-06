@@ -6,7 +6,7 @@
     "website": "https://github.com/OCA/account-invoicing",
     "license": "LGPL-3",
     "depends": [
-        "account", "account_edi", "base", "account_accountant"
+        "account", "account_edi", "base", "account_accountant", 'l10n_ec_edi'
     ],
     "data": [
         "security/ir.model.access.csv",

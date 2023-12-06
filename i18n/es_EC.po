@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-06 17:25+0000\n"
-"PO-Revision-Date: 2023-12-06 17:25+0000\n"
+"POT-Creation-Date: 2023-12-06 20:52+0000\n"
+"PO-Revision-Date: 2023-12-06 20:52+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -209,6 +209,13 @@ msgid "Base I.R."
 msgstr "Base I.R."
 
 #. module: l10n_ec_liquitadion_credit_card
+#. odoo-python
+#: code:addons/l10n_ec_liquitadion_credit_card/models/credit_card_liquidation.py:0
+#, python-format
+msgid "Base of Credit Card Liquidation %s"
+msgstr "Base de la liquidación de la tarjeta de crédito %s"
+
+#. module: l10n_ec_liquitadion_credit_card
 #: model:ir.model.fields,field_description:l10n_ec_liquitadion_credit_card.field_account_payment__l10n_ec_recap_id
 #: model:ir.model.fields,field_description:l10n_ec_liquitadion_credit_card.field_account_payment_register__l10n_ec_recap_id
 msgid "Batch / RECAP"
@@ -245,6 +252,13 @@ msgid "Commission"
 msgstr "Comisión"
 
 #. module: l10n_ec_liquitadion_credit_card
+#. odoo-python
+#: code:addons/l10n_ec_liquitadion_credit_card/models/credit_card_liquidation.py:0
+#, python-format
+msgid "Commission Credit Card Liquidation %s"
+msgstr "Comisión Liquidación de tarjeta de crédito %s"
+
+#. module: l10n_ec_liquitadion_credit_card
 #: model:ir.model.fields,field_description:l10n_ec_liquitadion_credit_card.field_account_credit_card_liquidation__account_commission_expense_id
 msgid "Commission Expense Account"
 msgstr "Cuenta de gastos de comisión"
@@ -259,6 +273,13 @@ msgstr "Comisión IVA"
 #: model:ir.model.fields,field_description:l10n_ec_liquitadion_credit_card.field_account_credit_card_liquidation__commission_wo_invoice
 msgid "Commission without Invoice"
 msgstr "Comisión sin factura"
+
+#. module: l10n_ec_liquitadion_credit_card
+#. odoo-python
+#: code:addons/l10n_ec_liquitadion_credit_card/models/credit_card_liquidation.py:0
+#, python-format
+msgid "Commission without Invoice Credit Card %s"
+msgstr "Comisión sin tarjeta de crédito de factura %s"
 
 #. module: l10n_ec_liquitadion_credit_card
 #: model:ir.model.fields,field_description:l10n_ec_liquitadion_credit_card.field_account_credit_card_liquidation__company_id
@@ -520,6 +541,14 @@ msgid "Income Tax"
 msgstr "Impuesto sobre la renta"
 
 #. module: l10n_ec_liquitadion_credit_card
+#. odoo-python
+#: code:addons/l10n_ec_liquitadion_credit_card/models/credit_card_liquidation.py:0
+#, python-format
+msgid "Income Tax Withholding Credit Card %s"
+msgstr ""
+"Retención del impuesto sobre la renta Retención de la tarjeta de crédito %s"
+
+#. module: l10n_ec_liquitadion_credit_card
 #: model:ir.model.fields,field_description:l10n_ec_liquitadion_credit_card.field_account_credit_card_liquidation__invoice_id
 #: model:ir.model.fields,field_description:l10n_ec_liquitadion_credit_card.field_account_credit_card_liquidation_invoice_detail__invoice_id
 msgid "Invoice"
@@ -687,7 +716,7 @@ msgstr "Número"
 
 #. module: l10n_ec_liquitadion_credit_card
 #: model:ir.model.fields,field_description:l10n_ec_liquitadion_credit_card.field_account_credit_card_liquidation__account_id
-msgid "Origin Account (CC)"
+msgid "Origin Account(CC)"
 msgstr "Cuenta de origen (CC)"
 
 #. module: l10n_ec_liquitadion_credit_card
@@ -859,6 +888,13 @@ msgstr "IVA"
 #: model:ir.model.fields,field_description:l10n_ec_liquitadion_credit_card.field_account_credit_card_liquidation__account_withhold_iva_id
 msgid "VAT Withhold Account"
 msgstr "Cuenta de retención de IVA"
+
+#. module: l10n_ec_liquitadion_credit_card
+#. odoo-python
+#: code:addons/l10n_ec_liquitadion_credit_card/models/credit_card_liquidation.py:0
+#, python-format
+msgid "VAT Withholding Credit Card %s"
+msgstr "IVA retención de tarjeta de crédito %s"
 
 #. module: l10n_ec_liquitadion_credit_card
 #: model_terms:ir.ui.view,arch_db:l10n_ec_liquitadion_credit_card.report_credit_card_liquidation
