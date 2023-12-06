@@ -683,19 +683,31 @@ class AccountCreditCardLiquidation(models.Model):
 
         dummy, account = self._tax_compute_all_helper(1.0, self.tax_id_ret)
         vals_base_line = {
-            **self._get_move_line_default_values(self.base, True),
+            **self._get_move_line_default_values(self.base, False),
             'name': 'Base Ret: ' + self.tax_id_ret.name,
             'tax_ids': [Command.set(self.tax_id_ret.ids)],
             'account_id': account,
         }
+        vals_base_line_counterpart = {
+            **self._get_move_line_default_values(self.base, True),  # Counterpart 0 operation
+            'name': 'Base Ret Cont: ' + self.tax_id_ret.name,
+            'account_id': account,
+        }
+        total_lines.append(vals_base_line_counterpart)
         total_lines.append(vals_base_line)
         dummy, account = self._tax_compute_all_helper(1.0, self.tax_id_vat)
         vals_base_line = {
-            **self._get_move_line_default_values(self.base, True),
+            **self._get_move_line_default_values(self.base, False),
             'name': 'Base Ret: ' + self.tax_id_vat.name,
             'tax_ids': [Command.set(self.tax_id_vat.ids)],
             'account_id': account,
         }
+        vals_base_line_counterpart = {
+            **self._get_move_line_default_values(self.base, True),  # Counterpart 0 operation
+            'name': 'Base Ret Cont: ' + self.tax_id_ret.name,
+            'account_id': account,
+        }
+        total_lines.append(vals_base_line_counterpart)
         total_lines.append(vals_base_line)
         payment_account_id = self.account_id
         amount = self.iva_withhold + self.rent_withhold
