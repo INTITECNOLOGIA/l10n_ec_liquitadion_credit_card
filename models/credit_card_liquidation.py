@@ -15,7 +15,7 @@ _STATES_DOC = {"done": [("readonly", True)], "cancel": [("readonly", True)]}
 
 class AccountCreditCardLiquidation(models.Model):
     _name = "account.credit.card.liquidation"
-    _description = "account.credit.card.liquidation"
+    _description = "Account Credit Card Liquidation"
 
     number = fields.Char(
         string="Liquidation Number", readonly=True, default="/", required=True
@@ -42,7 +42,7 @@ class AccountCreditCardLiquidation(models.Model):
     )
     account_id = fields.Many2one(
         comodel_name="account.account",
-        string="Origin Account(CC)",
+        string="Origin Account (CC)",
         required=True,
         readonly=True,
         states=_STATES_DOC,
@@ -50,7 +50,7 @@ class AccountCreditCardLiquidation(models.Model):
 
     journal_id = fields.Many2one(
         comodel_name="account.journal",
-        string="Dest. Journal",
+        string="Destination Journal",
         required=True,
         readonly=True,
         states=_STATES_DOC,
@@ -69,7 +69,7 @@ class AccountCreditCardLiquidation(models.Model):
         states=_STATES_DOC,
     )
 
-    journal_ret_id = fields.Many2one('account.journal', string="Diario",
+    journal_ret_id = fields.Many2one('account.journal', string="Journal",
                                      domain=[("l10n_ec_withhold_type", "=", "out_withhold")])
 
     date_account = fields.Date(
@@ -132,14 +132,14 @@ class AccountCreditCardLiquidation(models.Model):
     percentage_ret_rent = fields.Float(
         string="Rent Withhold Percent", readonly=True, states=_STATES_DOC, default=2
     )
-    tax_id_ret = fields.Many2one('account.tax', string='Impuesto Renta')
-    tax_id_vat = fields.Many2one('account.tax', string='Impuesto Iva')
+    tax_id_ret = fields.Many2one('account.tax', string='Income Tax')
+    tax_id_vat = fields.Many2one('account.tax', string='VAT')
     commission_wo_invoice = fields.Float(
         string="Commission without Invoice", readonly=True, states=_STATES_DOC
     )
     account_commission_id = fields.Many2one(
         "account.account",
-        string="Account for commission without Invoice",
+        string="Account for Commission without Invoice",
         readonly=True,
         states=_STATES_DOC,
     )
@@ -151,13 +151,13 @@ class AccountCreditCardLiquidation(models.Model):
     )
     account_withhold_iva_id = fields.Many2one(
         comodel_name="account.account",
-        string="IVA Withhold Account",
+        string="VAT Withhold Account",
         readonly=True,
         states=_STATES_DOC,
     )
     account_commission_expense_id = fields.Many2one(
         comodel_name="account.account",
-        string="Cuenta de Gasto de Comisión",
+        string="Commission Expense Account",
         readonly=True,
         states=_STATES_DOC,
     )
