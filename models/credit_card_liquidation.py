@@ -31,20 +31,18 @@ class AccountCreditCardLiquidation(models.Model):
         comodel_name="res.partner",
         string="Supplier",
         required=True,
-        readonly=True,
         states=_STATES_DOC,
     )
     invoice_id = fields.Many2one(
-        comodel_name="account.move", string="Invoice", readonly=True, states=_STATES_DOC
+        comodel_name="account.move", string="Invoice", states=_STATES_DOC
     )
     withhold_id = fields.Many2one(
         comodel_name="account.move", string="Withhold", readonly=True
     )
     account_id = fields.Many2one(
         comodel_name="account.account",
-        string="Origin Account (CC)",
+        string="Origin Account(CC)",
         required=True,
-        readonly=True,
         states=_STATES_DOC,
     )
 
@@ -52,7 +50,6 @@ class AccountCreditCardLiquidation(models.Model):
         comodel_name="account.journal",
         string="Destination Journal",
         required=True,
-        readonly=True,
         states=_STATES_DOC,
     )
     move_id = fields.Many2one(
@@ -64,7 +61,6 @@ class AccountCreditCardLiquidation(models.Model):
     )
     issue_date = fields.Date(
         string="Withhold Date",
-        readonly=True,
         copy=False,
         states=_STATES_DOC,
     )
@@ -74,14 +70,13 @@ class AccountCreditCardLiquidation(models.Model):
 
     date_account = fields.Date(
         string="Accounting Date",
-        readonly=True,
         required=True,
         index=True,
         copy=False,
         states=_STATES_DOC,
     )
     document_number = fields.Char(
-        string="Withhold Number", size=17, readonly=True, states=_STATES_DOC
+        string="Withhold Number", size=17, states=_STATES_DOC
     )
     document_type = fields.Selection(
         selection=[
@@ -90,7 +85,6 @@ class AccountCreditCardLiquidation(models.Model):
             ("auto_printer", "Auto Printer"),
         ],
         string="Emission Type",
-        readonly=True,
         required=False,
         states=_STATES_DOC,
         default="electronic",
@@ -101,7 +95,6 @@ class AccountCreditCardLiquidation(models.Model):
         index=True,
         size=49,
         required=False,
-        readonly=True,
         states=_STATES_DOC,
     )
     line_ids = fields.One2many(
@@ -109,80 +102,65 @@ class AccountCreditCardLiquidation(models.Model):
         inverse_name="liquidation_id",
         string="Details",
         required=False,
-        readonly=True,
         states=_STATES_DOC,
     )
     additional_lines_ids = fields.Many2many(
         comodel_name="account.credit.card.liquidation.line",
         relation="additional_line_liquidation_line_rel",
         string="Additional Details",
-        readonly=True,
         states=_STATES_DOC,
     )
     line_invoice_ids = fields.One2many(
         comodel_name="account.credit.card.liquidation.invoice.detail",
         inverse_name="liquidation_id",
         string="Invoice to Reconcile",
-        readonly=True,
         states=_STATES_DOC,
     )
     percentage_ret_iva = fields.Float(
-        string="IVA Withhold Percent", readonly=True, states=_STATES_DOC, default=30
+        string="IVA Withhold Percent",  states=_STATES_DOC, default=30
     )
     percentage_ret_rent = fields.Float(
-        string="Rent Withhold Percent", readonly=True, states=_STATES_DOC, default=2
+        string="Rent Withhold Percent",  states=_STATES_DOC, default=2
     )
     tax_id_ret = fields.Many2one('account.tax', string='Income Tax')
     tax_id_vat = fields.Many2one('account.tax', string='VAT')
     commission_wo_invoice = fields.Float(
-        string="Commission without Invoice", readonly=True, states=_STATES_DOC
+        string="Commission without Invoice",  states=_STATES_DOC
     )
     account_commission_id = fields.Many2one(
         "account.account",
         string="Account for Commission without Invoice",
-        readonly=True,
         states=_STATES_DOC,
     )
     account_withhold_rent_id = fields.Many2one(
         comodel_name="account.account",
         string="Rent Withhold Account",
-        readonly=True,
         states=_STATES_DOC,
     )
     account_withhold_iva_id = fields.Many2one(
         comodel_name="account.account",
         string="VAT Withhold Account",
-        readonly=True,
         states=_STATES_DOC,
     )
     account_commission_expense_id = fields.Many2one(
         comodel_name="account.account",
         string="Commission Expense Account",
-        readonly=True,
         states=_STATES_DOC,
     )
     no_invoice = fields.Boolean(
-        string="No Reconcile Invoice?", readonly=True, states=_STATES_DOC
+        string="No Reconcile Invoice?", states=_STATES_DOC
     )
     no_withhold = fields.Boolean(
-        string="No Input Withhold?", readonly=True, states=_STATES_DOC
+        string="No Input Withhold?", states=_STATES_DOC
     )
     split_lines_by_recap = fields.Boolean(
-        string="Split Journal by RECAP?", readonly=True, states=_STATES_DOC
+        string="Split Journal by RECAP?", states=_STATES_DOC
     )
     account_analytic_id = fields.Many2one(
         comodel_name="account.analytic.account",
         string="Analytic Account",
-        readonly=True,
         states=_STATES_DOC,
     )
-
-    # analytic_tag_ids = fields.Many2many(
-    #     comodel_name="account.analytic.tag",
-    #     string="Analytic Tags",
-    #     readonly=True,
-    #     states=_STATES_DOC,
-    # )
 
     @api.depends(
         "line_ids.base",
@@ -273,7 +251,6 @@ class AccountCreditCardLiquidation(models.Model):
             ("cancel", "Cancel"),
         ],
         string="State",
-        readonly=True,
         required=True,
         default="draft",
     )
@@ -370,11 +347,7 @@ class AccountCreditCardLiquidation(models.Model):
                     and not liquidation.no_invoice):
                 raise UserError(
                     _("You must select a single way to reconcile invoices, either multiple or a single invoice to record the document"))
-            if (
-                    liquidation.invoice_id
-                    and liquidation.line_invoice_ids
-                    and not liquidation.no_invoice
-            ):
+            if (liquidation.invoice_id and liquidation.line_invoice_ids and not liquidation.no_invoice):
                 raise UserError(
                     _("You must select a single way to reconcile invoices, either multiple or a single invoice. Please make sure not to have both options selected at the same time"))
             if liquidation.split_lines_by_recap and not liquidation.no_invoice:
@@ -470,9 +443,7 @@ class AccountCreditCardLiquidation(models.Model):
                 )
             if liquidation.commission or liquidation.commission_iva:
                 for invoice_id in invoice_to_liquidate.keys():
-                    amount_line = (liquidation.commission_iva or 0.0) + (
-                            liquidation.commission + 0.0
-                    )
+                    amount_line = (liquidation.commission_iva or 0.0) + (liquidation.commission + 0.0)
                     if multi_invoice:
                         amount_line = invoice_to_liquidate[invoice_id].get("amount_to_concile", 0.0)
                     name = ("Commission Credit Card Liquidation %s" % (number_liquidation) + name_recap)
