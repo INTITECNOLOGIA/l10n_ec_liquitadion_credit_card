@@ -10,7 +10,7 @@ from odoo.tools.translate import _
 
 _logger = logging.getLogger(__name__)
 
-_STATES_DOC = {"draft": [("readonly", False)]}
+_STATES_DOC = {"done": [("readonly", True)], "cancel": [("readonly", True)]}
 
 
 class AccountCreditCardLiquidation(models.Model):
@@ -683,13 +683,13 @@ class AccountCreditCardLiquidation(models.Model):
 
         dummy, account = self._tax_compute_all_helper(1.0, self.tax_id_ret)
         vals_base_line = {
-            **self._get_move_line_default_values(self.base, False),
+            **self._get_move_line_default_values(self.rent_base, False),
             'name': 'Base Ret: ' + self.tax_id_ret.name,
             'tax_ids': [Command.set(self.tax_id_ret.ids)],
             'account_id': account,
         }
         vals_base_line_counterpart = {
-            **self._get_move_line_default_values(self.base, True),  # Counterpart 0 operation
+            **self._get_move_line_default_values(self.rent_base, True),  # Counterpart 0 operation
             'name': 'Base Ret Cont: ' + self.tax_id_ret.name,
             'account_id': account,
         }
