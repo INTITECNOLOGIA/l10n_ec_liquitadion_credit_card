@@ -191,7 +191,6 @@ class AccountCreditCardLiquidation(models.Model):
     # )
 
     @api.depends(
-        "line_ids",
         "line_ids.base",
         "line_ids.commission",
         "line_ids.commission_iva",
@@ -199,65 +198,37 @@ class AccountCreditCardLiquidation(models.Model):
         "line_ids.rent_base",
         "line_ids.rent_withhold",
         "line_ids.net_value",
+        "additional_lines_ids.base",
+        "additional_lines_ids.commission",
+        "additional_lines_ids.commission_iva",
+        "additional_lines_ids.iva_withhold",
+        "additional_lines_ids.rent_base",
+        "additional_lines_ids.rent_withhold",
+        "additional_lines_ids.net_value",
     )
     def _compute_liquidation_values(self):
         for liquidation in self:
-            base = sum(
-                liquidation.line_ids.filtered(lambda x: not x.skip_payment).mapped(
-                    "base"
-                )
-            )
-            base += sum(liquidation.additional_lines_ids.mapped("base"))
-            commission = sum(
-                liquidation.line_ids.filtered(lambda x: not x.skip_payment).mapped(
-                    "commission"
-                )
-            )
-            commission += sum(liquidation.additional_lines_ids.mapped("commission"))
-            commission_iva = sum(
-                liquidation.line_ids.filtered(lambda x: not x.skip_payment).mapped(
-                    "commission_iva"
-                )
-            )
-            commission_iva += sum(
-                liquidation.additional_lines_ids.mapped("commission_iva")
-            )
-            iva_withhold = sum(
-                liquidation.line_ids.filtered(lambda x: not x.skip_payment).mapped(
-                    "iva_withhold"
-                )
-            )
-            iva_withhold += sum(liquidation.additional_lines_ids.mapped("iva_withhold"))
-            rent_base = sum(
-                liquidation.line_ids.filtered(lambda x: not x.skip_payment).mapped(
-                    "rent_base"
-                )
-            )
-            rent_base += sum(liquidation.additional_lines_ids.mapped("rent_base"))
-            rent_withhold = sum(
-                liquidation.line_ids.filtered(lambda x: not x.skip_payment).mapped(
-                    "rent_withhold"
-                )
-            )
-            rent_withhold += sum(
-                liquidation.additional_lines_ids.mapped("rent_withhold")
-            )
-            net_value = (
-                    sum(
-                        liquidation.line_ids.filtered(lambda x: not x.skip_payment).mapped(
-                            "net_value"
-                        )
-                    )
-                    - liquidation.commission_wo_invoice
-            )
-            net_value += sum(liquidation.additional_lines_ids.mapped("net_value"))
-            liquidation.base = base
-            liquidation.commission = commission
-            liquidation.commission_iva = commission_iva
-            liquidation.iva_withhold = iva_withhold
-            liquidation.rent_base = rent_base
-            liquidation.rent_withhold = rent_withhold
-            liquidation.net_value = net_value
+            base = sum(liquidation._get_lines_values("base"))
+            commission = sum(liquidation._get_lines_values("commission"))
+            commission_iva = sum(liquidation._get_lines_values("commission_iva"))
+            iva_withhold = sum(liquidation._get_lines_values("iva_withhold"))
+            rent_base = sum(liquidation._get_lines_values("rent_base"))
+            rent_withhold = sum(liquidation._get_lines_values("rent_withhold"))
+            net_value = sum(liquidation._get_lines_values("net_value")) - liquidation.commission_wo_invoice
+            liquidation._set_values(base, commission, commission_iva, iva_withhold, rent_base, rent_withhold, net_value)
+
+    def _get_lines_values(self, field):
+        return sum(self.line_ids.filtered(lambda x: not x.skip_payment).mapped(field)) + sum(
+            self.additional_lines_ids.mapped(field))
+
+    def _set_values(self, base, commission, commission_iva, iva_withhold, rent_base, rent_withhold, net_value):
+        self.base = base
+        self.commission = commission
+        self.commission_iva = commission_iva
+        self.iva_withhold = iva_withhold
+        self.rent_base = rent_base
+        self.rent_withhold = rent_withhold
+        self.net_value = net_value
 
     base = fields.Float(
         string="Base",
@@ -523,9 +494,7 @@ class AccountCreditCardLiquidation(models.Model):
                 str(e) for e in liquidation.line_ids.mapped("recap_id").mapped("name")
             )
             if liquidation.base:
-                base = liquidation.base - (
-                        liquidation.iva_withhold + liquidation.rent_withhold
-                )
+                base = liquidation.base
                 amount_line = (liquidation.commission_iva or 0.0) + (
                         liquidation.commission + 0.0)
 
@@ -535,7 +504,7 @@ class AccountCreditCardLiquidation(models.Model):
                         am,
                         liquidation.account_id,
                         name,
-                        debit=base - amount_line,
+                        credit=base,
                         partner=liquidation.partner_id,
                     )
                 )
@@ -586,7 +555,7 @@ class AccountCreditCardLiquidation(models.Model):
                             am,
                             payment_account_id,
                             name,
-                            credit=line.net_value,
+                            debit=line.net_value,
                             partner=liquidation.partner_id,
                         )
                     )
@@ -601,16 +570,16 @@ class AccountCreditCardLiquidation(models.Model):
                         _("Valor Neto Liquidación TC %s") % (number_liquidation)
                         + name_recap
                 )
-                value = liquidation.base
+                value = liquidation.net_value
                 if not liquidation.no_withhold:
-                    value = liquidation.net_value + (liquidation.commission_iva or 0.0) + (
+                    value = value - (liquidation.commission_iva or 0.0) - (
                             liquidation.commission + 0.0)
                 aml_model.with_context(check_move_validity=False).create(
                     liquidation._prepare_move_line_vals(
                         am,
                         payment_account_id,
                         name,
-                        credit=value,
+                        debit=value,
                         partner=liquidation.partner_id,
                     )
                 )
