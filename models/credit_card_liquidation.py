@@ -429,13 +429,13 @@ class AccountCreditCardLiquidation(models.Model):
                                    + (liquidation.iva_withhold or 0.0))
                     base = base - amount_line
 
-                name = "Base of Credit Card Liquidation %s" % (number_liquidation) + name_recap
+                name = _("Base of Credit Card Liquidation %s") % (number_liquidation) + name_recap
                 aml_model.with_context(check_move_validity=False).create(
                     liquidation._prepare_move_line_vals(am, liquidation.account_id, name, credit=base,
                                                         partner=liquidation.partner_id, )
                 )
             if liquidation.commission_wo_invoice > 0 and not liquidation.no_invoice:
-                name = "Commission without Invoice Credit Card %s" % (number_liquidation) + name_recap
+                name = _("Commission without Invoice Credit Card %s") % (number_liquidation) + name_recap
                 aml_model.with_context(check_move_validity=False).create(
                     liquidation._prepare_move_line_vals(am, liquidation.partner_id.property_account_payable_id, name,
                                                         credit=liquidation.commission_wo_invoice,
@@ -485,13 +485,13 @@ class AccountCreditCardLiquidation(models.Model):
                 )
 
             if liquidation.no_withhold and liquidation.rent_withhold > 0:
-                name = "Income Tax Withholding Credit Card %s" % (number_liquidation) + name_recap
+                name = _("Income Tax Withholding Credit Card %s") % (number_liquidation) + name_recap
                 aml_model.with_context(check_move_validity=False).create(
                     liquidation._prepare_move_line_vals(am, liquidation.account_withhold_rent_id, name,
                                                         debit=liquidation.rent_withhold,
                                                         partner=liquidation.partner_id, ))
             if liquidation.no_withhold and liquidation.iva_withhold > 0:
-                name = "VAT Withholding Credit Card %s" % (number_liquidation) + name_recap
+                name = _("VAT Withholding Credit Card %s") % (number_liquidation) + name_recap
                 aml_model.with_context(check_move_validity=False).create(
                     liquidation._prepare_move_line_vals(am, liquidation.account_withhold_iva_id, name,
                                                         debit=liquidation.iva_withhold,
