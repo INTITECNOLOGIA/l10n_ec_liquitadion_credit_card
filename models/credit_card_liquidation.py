@@ -495,8 +495,12 @@ class AccountCreditCardLiquidation(models.Model):
             )
             if liquidation.base:
                 base = liquidation.base
-                amount_line = (liquidation.commission_iva or 0.0) + (
-                        liquidation.commission + 0.0)
+                if not liquidation.no_withhold:
+                    amount_line = ((liquidation.commission_iva or 0.0)
+                                   + (liquidation.commission + 0.0)
+                                   + (liquidation.rent_withhold or 0.0)
+                                   + (liquidation.iva_withhold or 0.0))
+                    base = base - amount_line
 
                 name = "Base de Liquidación TC %s" % (number_liquidation) + name_recap
                 aml_model.with_context(check_move_validity=False).create(
