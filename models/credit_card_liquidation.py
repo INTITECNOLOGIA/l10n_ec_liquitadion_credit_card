@@ -117,15 +117,15 @@ class AccountCreditCardLiquidation(models.Model):
         states=_STATES_DOC,
     )
     percentage_ret_iva = fields.Float(
-        string="IVA Withhold Percent",  states=_STATES_DOC, default=30
+        string="IVA Withhold Percent", states=_STATES_DOC, default=30
     )
     percentage_ret_rent = fields.Float(
-        string="Rent Withhold Percent",  states=_STATES_DOC, default=2
+        string="Rent Withhold Percent", states=_STATES_DOC, default=2
     )
     tax_id_ret = fields.Many2one('account.tax', string='Income Tax')
     tax_id_vat = fields.Many2one('account.tax', string='VAT')
     commission_wo_invoice = fields.Float(
-        string="Commission without Invoice",  states=_STATES_DOC
+        string="Commission without Invoice", states=_STATES_DOC
     )
     account_commission_id = fields.Many2one(
         "account.account",
@@ -444,13 +444,17 @@ class AccountCreditCardLiquidation(models.Model):
             if liquidation.commission or liquidation.commission_iva:
                 for invoice_id in invoice_to_liquidate.keys():
                     amount_line = (liquidation.commission_iva or 0.0) + (liquidation.commission + 0.0)
+                    account_id = liquidation.partner_id.property_account_payable_id
+                    if liquidation.no_invoice:
+                        account_id = liquidation.account_commission_id
                     if multi_invoice:
                         amount_line = invoice_to_liquidate[invoice_id].get("amount_to_concile", 0.0)
-                    name = ("Commission Credit Card Liquidation %s" % (number_liquidation) + name_recap)
+                    name = _("Commission Credit Card Liquidation %s" % (number_liquidation) + name_recap)
                     aml = aml_model.with_context(check_move_validity=False).create(
-                        liquidation._prepare_move_line_vals(am, liquidation.partner_id.property_account_payable_id,
+                        liquidation._prepare_move_line_vals(am, account_id,
                                                             name, debit=amount_line, partner=liquidation.partner_id, ))
-                    invoice_to_liquidate[invoice_id]["amls_to_concile"].append(aml.id)
+                    if not liquidation.no_invoice:
+                        invoice_to_liquidate[invoice_id]["amls_to_concile"].append(aml.id)
             # Create grouped entries or per recap
             # depending on what the user has selected
             if liquidation.split_lines_by_recap:
@@ -479,11 +483,7 @@ class AccountCreditCardLiquidation(models.Model):
                         partner=liquidation.partner_id,
                     )
                 )
-            if liquidation.no_invoice and total_comission > 0:
-                name = "Commission Credit Card %s" % (number_liquidation) + name_recap
-                aml_model.with_context(check_move_validity=False).create(
-                    liquidation._prepare_move_line_vals(am, liquidation.account_commission_expense_id, name,
-                                                        credit=total_comission, partner=liquidation.partner_id, ))
+
             if liquidation.no_withhold and liquidation.rent_withhold > 0:
                 name = "Income Tax Withholding Credit Card %s" % (number_liquidation) + name_recap
                 aml_model.with_context(check_move_validity=False).create(
