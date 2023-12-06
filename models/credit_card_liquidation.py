@@ -10,12 +10,12 @@ from odoo.tools.translate import _
 
 _logger = logging.getLogger(__name__)
 
-_STATES_DOC = {"draft": [("readonly", False)]}
+_STATES_DOC = {"done": [("readonly", True)], "cancel": [("readonly", True)]}
 
 
 class AccountCreditCardLiquidation(models.Model):
     _name = "account.credit.card.liquidation"
-    _description = "account.credit.card.liquidation"
+    _description = "Account Credit Card Liquidation"
 
     number = fields.Char(
         string="Liquidation Number", readonly=True, default="/", required=True
@@ -31,11 +31,10 @@ class AccountCreditCardLiquidation(models.Model):
         comodel_name="res.partner",
         string="Supplier",
         required=True,
-        readonly=True,
         states=_STATES_DOC,
     )
     invoice_id = fields.Many2one(
-        comodel_name="account.move", string="Invoice", readonly=True, states=_STATES_DOC
+        comodel_name="account.move", string="Invoice", states=_STATES_DOC
     )
     withhold_id = fields.Many2one(
         comodel_name="account.move", string="Withhold", readonly=True
@@ -44,21 +43,13 @@ class AccountCreditCardLiquidation(models.Model):
         comodel_name="account.account",
         string="Origin Account(CC)",
         required=True,
-        readonly=True,
         states=_STATES_DOC,
     )
-    account_commission_id = fields.Many2one(
-        comodel_name="account.account",
-        string="Commission Account(CC)",
-        required=True,
-        readonly=True,
-        states=_STATES_DOC,
-    )
+
     journal_id = fields.Many2one(
         comodel_name="account.journal",
-        string="Dest. Journal",
+        string="Destination Journal",
         required=True,
-        readonly=True,
         states=_STATES_DOC,
     )
     move_id = fields.Many2one(
@@ -70,24 +61,22 @@ class AccountCreditCardLiquidation(models.Model):
     )
     issue_date = fields.Date(
         string="Withhold Date",
-        readonly=True,
         copy=False,
         states=_STATES_DOC,
     )
 
-    journal_ret_id = fields.Many2one('account.journal', string="Diario",
+    journal_ret_id = fields.Many2one('account.journal', string="Journal",
                                      domain=[("l10n_ec_withhold_type", "=", "out_withhold")])
 
     date_account = fields.Date(
         string="Accounting Date",
-        readonly=True,
         required=True,
         index=True,
         copy=False,
         states=_STATES_DOC,
     )
     document_number = fields.Char(
-        string="Withhold Number", size=17, readonly=True, states=_STATES_DOC
+        string="Withhold Number", size=17, states=_STATES_DOC
     )
     document_type = fields.Selection(
         selection=[
@@ -96,7 +85,6 @@ class AccountCreditCardLiquidation(models.Model):
             ("auto_printer", "Auto Printer"),
         ],
         string="Emission Type",
-        readonly=True,
         required=False,
         states=_STATES_DOC,
         default="electronic",
@@ -107,7 +95,6 @@ class AccountCreditCardLiquidation(models.Model):
         index=True,
         size=49,
         required=False,
-        readonly=True,
         states=_STATES_DOC,
     )
     line_ids = fields.One2many(
@@ -115,83 +102,67 @@ class AccountCreditCardLiquidation(models.Model):
         inverse_name="liquidation_id",
         string="Details",
         required=False,
-        readonly=True,
         states=_STATES_DOC,
     )
     additional_lines_ids = fields.Many2many(
         comodel_name="account.credit.card.liquidation.line",
         relation="additional_line_liquidation_line_rel",
         string="Additional Details",
-        readonly=True,
         states=_STATES_DOC,
     )
     line_invoice_ids = fields.One2many(
         comodel_name="account.credit.card.liquidation.invoice.detail",
         inverse_name="liquidation_id",
         string="Invoice to Reconcile",
-        readonly=True,
         states=_STATES_DOC,
     )
     percentage_ret_iva = fields.Float(
-        string="IVA Withhold Percent", readonly=True, states=_STATES_DOC, default=30
+        string="IVA Withhold Percent",  states=_STATES_DOC, default=30
     )
     percentage_ret_rent = fields.Float(
-        string="Rent Withhold Percent", readonly=True, states=_STATES_DOC, default=2
+        string="Rent Withhold Percent",  states=_STATES_DOC, default=2
     )
-    tax_id_ret = fields.Many2one('account.tax', string='Impuesto Renta')
-    tax_id_vat = fields.Many2one('account.tax', string='Impuesto Iva')
+    tax_id_ret = fields.Many2one('account.tax', string='Income Tax')
+    tax_id_vat = fields.Many2one('account.tax', string='VAT')
     commission_wo_invoice = fields.Float(
-        string="Commission without Invoice", readonly=True, states=_STATES_DOC
+        string="Commission without Invoice",  states=_STATES_DOC
     )
     account_commission_id = fields.Many2one(
         "account.account",
-        string="Account for commission without Invoice",
-        readonly=True,
+        string="Account for Commission without Invoice",
         states=_STATES_DOC,
     )
     account_withhold_rent_id = fields.Many2one(
         comodel_name="account.account",
         string="Rent Withhold Account",
-        readonly=True,
         states=_STATES_DOC,
     )
     account_withhold_iva_id = fields.Many2one(
         comodel_name="account.account",
-        string="IVA Withhold Account",
-        readonly=True,
+        string="VAT Withhold Account",
         states=_STATES_DOC,
     )
     account_commission_expense_id = fields.Many2one(
         comodel_name="account.account",
-        string="Cuenta de Gasto de Comisión",
-        readonly=True,
+        string="Commission Expense Account",
         states=_STATES_DOC,
     )
     no_invoice = fields.Boolean(
-        string="No Reconcile Invoice?", readonly=True, states=_STATES_DOC
+        string="No Reconcile Invoice?", states=_STATES_DOC
     )
     no_withhold = fields.Boolean(
-        string="No Input Withhold?", readonly=True, states=_STATES_DOC
+        string="No Input Withhold?", states=_STATES_DOC
     )
     split_lines_by_recap = fields.Boolean(
-        string="Split Journal by RECAP?", readonly=True, states=_STATES_DOC
+        string="Split Journal by RECAP?", states=_STATES_DOC
     )
     account_analytic_id = fields.Many2one(
         comodel_name="account.analytic.account",
         string="Analytic Account",
-        readonly=True,
         states=_STATES_DOC,
     )
 
-    # analytic_tag_ids = fields.Many2many(
-    #     comodel_name="account.analytic.tag",
-    #     string="Analytic Tags",
-    #     readonly=True,
-    #     states=_STATES_DOC,
-    # )
-
     @api.depends(
-        "line_ids",
         "line_ids.base",
         "line_ids.commission",
         "line_ids.commission_iva",
@@ -199,65 +170,37 @@ class AccountCreditCardLiquidation(models.Model):
         "line_ids.rent_base",
         "line_ids.rent_withhold",
         "line_ids.net_value",
+        "additional_lines_ids.base",
+        "additional_lines_ids.commission",
+        "additional_lines_ids.commission_iva",
+        "additional_lines_ids.iva_withhold",
+        "additional_lines_ids.rent_base",
+        "additional_lines_ids.rent_withhold",
+        "additional_lines_ids.net_value",
     )
     def _compute_liquidation_values(self):
         for liquidation in self:
-            base = sum(
-                liquidation.line_ids.filtered(lambda x: not x.skip_payment).mapped(
-                    "base"
-                )
-            )
-            base += sum(liquidation.additional_lines_ids.mapped("base"))
-            commission = sum(
-                liquidation.line_ids.filtered(lambda x: not x.skip_payment).mapped(
-                    "commission"
-                )
-            )
-            commission += sum(liquidation.additional_lines_ids.mapped("commission"))
-            commission_iva = sum(
-                liquidation.line_ids.filtered(lambda x: not x.skip_payment).mapped(
-                    "commission_iva"
-                )
-            )
-            commission_iva += sum(
-                liquidation.additional_lines_ids.mapped("commission_iva")
-            )
-            iva_withhold = sum(
-                liquidation.line_ids.filtered(lambda x: not x.skip_payment).mapped(
-                    "iva_withhold"
-                )
-            )
-            iva_withhold += sum(liquidation.additional_lines_ids.mapped("iva_withhold"))
-            rent_base = sum(
-                liquidation.line_ids.filtered(lambda x: not x.skip_payment).mapped(
-                    "rent_base"
-                )
-            )
-            rent_base += sum(liquidation.additional_lines_ids.mapped("rent_base"))
-            rent_withhold = sum(
-                liquidation.line_ids.filtered(lambda x: not x.skip_payment).mapped(
-                    "rent_withhold"
-                )
-            )
-            rent_withhold += sum(
-                liquidation.additional_lines_ids.mapped("rent_withhold")
-            )
-            net_value = (
-                    sum(
-                        liquidation.line_ids.filtered(lambda x: not x.skip_payment).mapped(
-                            "net_value"
-                        )
-                    )
-                    - liquidation.commission_wo_invoice
-            )
-            net_value += sum(liquidation.additional_lines_ids.mapped("net_value"))
-            liquidation.base = base
-            liquidation.commission = commission
-            liquidation.commission_iva = commission_iva
-            liquidation.iva_withhold = iva_withhold
-            liquidation.rent_base = rent_base
-            liquidation.rent_withhold = rent_withhold
-            liquidation.net_value = net_value
+            base = liquidation._get_lines_values("base")
+            commission = liquidation._get_lines_values("commission")
+            commission_iva = liquidation._get_lines_values("commission_iva")
+            iva_withhold = liquidation._get_lines_values("iva_withhold")
+            rent_base = liquidation._get_lines_values("rent_base")
+            rent_withhold = liquidation._get_lines_values("rent_withhold")
+            net_value = liquidation._get_lines_values("net_value") - liquidation.commission_wo_invoice
+            liquidation._set_values(base, commission, commission_iva, iva_withhold, rent_base, rent_withhold, net_value)
+
+    def _get_lines_values(self, field):
+        return sum(self.line_ids.filtered(lambda x: not x.skip_payment).mapped(field)) + sum(
+            self.additional_lines_ids.mapped(field))
+
+    def _set_values(self, base, commission, commission_iva, iva_withhold, rent_base, rent_withhold, net_value):
+        self.base = base
+        self.commission = commission
+        self.commission_iva = commission_iva
+        self.iva_withhold = iva_withhold
+        self.rent_base = rent_base
+        self.rent_withhold = rent_withhold
+        self.net_value = net_value
 
     base = fields.Float(
         string="Base",
@@ -308,7 +251,6 @@ class AccountCreditCardLiquidation(models.Model):
             ("cancel", "Cancel"),
         ],
         string="State",
-        readonly=True,
         required=True,
         default="draft",
     )
@@ -399,48 +341,25 @@ class AccountCreditCardLiquidation(models.Model):
         seq_model = self.env["ir.sequence"]
         for liquidation in self:
             if not liquidation.line_ids:
-                raise UserError(_("Debe al menos ingresar una línea"))
-            if (
-                    not liquidation.invoice_id
+                raise UserError(_("You must enter at least one line"))
+            if (not liquidation.invoice_id
                     and not liquidation.line_invoice_ids
-                    and not liquidation.no_invoice
-            ):
+                    and not liquidation.no_invoice):
                 raise UserError(
-                    _(
-                        "Debe de seleccionar una unica forma "
-                        "de conciliar facturas, de manera multiple "
-                        "o una sola factura para asentar el documento"
-                    )
-                )
-            if (
-                    liquidation.invoice_id
-                    and liquidation.line_invoice_ids
-                    and not liquidation.no_invoice
-            ):
+                    _("You must select a single way to reconcile invoices, either multiple or a single invoice to record the document"))
+            if (liquidation.invoice_id and liquidation.line_invoice_ids and not liquidation.no_invoice):
                 raise UserError(
-                    _(
-                        "Debe de seleccionar una unica forma de conciliar facturas, "
-                        "de manera multiple o una sola factura, "
-                        "por favor revise no tener asignada las 2 formas a la ves"
-                    )
-                )
+                    _("You must select a single way to reconcile invoices, either multiple or a single invoice. Please make sure not to have both options selected at the same time"))
             if liquidation.split_lines_by_recap and not liquidation.no_invoice:
-                raise UserError(_("You can't split journal items with comission value"))
+                raise UserError(_("You can't split journal items with commission value"))
             msg = []
             for iline in liquidation.line_invoice_ids:
                 if iline.amount > iline.invoice_id.amount_residual:
-                    msg.append(
-                        "El monto %s supera al "
-                        "monto residual de la factura %s que es %s"
-                        % (
-                            iline.amount,
-                            iline.invoice_id.display_name,
-                            iline.invoice_id.amount_residual,
-                        )
-                    )
+                    msg.append(f"The amount {iline.amount} exceeds the "
+                               f"residual amount of the invoice {iline.invoice_id.display_name}, which is {iline.invoice_id.amount_residual}")
             if msg:
                 msg = "\n".join(msg)
-                raise UserError(_("Restriccions: %s") % (msg))
+                raise UserError(_("Restrictions: %s") % (msg))
             invoice_to_liquidate = {}
             multi_invoice = False
             if liquidation.invoice_id:
@@ -467,17 +386,8 @@ class AccountCreditCardLiquidation(models.Model):
                         and not liquidation.no_invoice
                 ):
                     raise UserError(
-                        _(
-                            "El monto a conciliar de las facturas %s "
-                            "no coincide con los valores de comisión e iva %s "
-                        )
-                        % (
-                            total_to_concile,
-                            (
-                                    (liquidation.commission_iva or 0.0)
-                                    + (liquidation.commission + 0.0)
-                            ),
-                        )
+                        _("The amount to reconcile from the invoices %s does not match the commission and VAT values %s")
+                        % (total_to_concile, ((liquidation.commission_iva or 0.0) + (liquidation.commission + 0.0)),)
                     )
             if not liquidation.no_withhold:
                 vals = self._prepare_withhold_header()
@@ -488,108 +398,69 @@ class AccountCreditCardLiquidation(models.Model):
                 self.withhold_id = withhold
 
             if not liquidation.no_invoice:
-                # Se trata de conciliar la factura
                 for invoice_id in invoice_to_liquidate.keys():
                     invoice = invoice_model.browse(invoice_id)
                     for line in invoice.line_ids:
-                        if (
-                                line.account_id.account_type
+                        if (line.account_id.account_type
                                 in ["asset_receivable", "liability_payable"]
                                 and line.partner_id
-                                and line.partner_id.id == invoice.partner_id.id
-                        ):
+                                and line.partner_id.id == invoice.partner_id.id):
                             invoice_to_liquidate[invoice_id]["amls_to_concile"].append(
                                 line.id
                             )
             number_liquidation = liquidation.number
             if liquidation.number == "/":
                 number_liquidation = seq_model.next_by_code("credit.card.liquidation")
-            am = am_model.create(
-                {
-                    "name": "/",
-                    "ref": "Liquidación TC %s" % (number_liquidation),
-                    "journal_id": liquidation.journal_id.id,
-                    "date": liquidation.date_account,
-                }
+            am = am_model.create({
+                "name": "/",
+                "ref": "Credit Card Liquidation %s" % (number_liquidation),
+                "journal_id": liquidation.journal_id.id,
+                "date": liquidation.date_account, }
             )
-            if not liquidation.account_commission_id:
+            if not liquidation.partner_id.property_account_payable_id:
                 raise UserError(
-                    _("Debe configurar la cuenta  de comiciones")
-                )
-            # Si se va a saldar una factura deberia solo tomar el parcial
-            # Valor de base que se debe sacar de la cuenta contable
+                    _("You must configure the supplier payment account"))
             base = 0.0
-            name_recap = " Recaps " + " - ".join(
-                str(e) for e in liquidation.line_ids.mapped("recap_id").mapped("name")
-            )
+            name_recap = " Recaps " + " - ".join(str(e) for e in liquidation.line_ids.mapped("recap_id").mapped("name"))
             if liquidation.base:
-                base = liquidation.base - (
-                        liquidation.iva_withhold + liquidation.rent_withhold
-                )
-                amount_line = (liquidation.commission_iva or 0.0) + (
-                        liquidation.commission + 0.0)
+                base = liquidation.base
+                if not liquidation.no_withhold:
+                    amount_line = ((liquidation.rent_withhold or 0.0)
+                                   + (liquidation.iva_withhold or 0.0))
+                    base = base - amount_line
 
-                name = "Base de Liquidación TC %s" % (number_liquidation) + name_recap
+                name = "Base of Credit Card Liquidation %s" % (number_liquidation) + name_recap
                 aml_model.with_context(check_move_validity=False).create(
-                    liquidation._prepare_move_line_vals(
-                        am,
-                        liquidation.account_id,
-                        name,
-                        debit=base - amount_line,
-                        partner=liquidation.partner_id,
-                    )
+                    liquidation._prepare_move_line_vals(am, liquidation.account_id, name, credit=base,
+                                                        partner=liquidation.partner_id, )
                 )
             if liquidation.commission_wo_invoice > 0 and not liquidation.no_invoice:
-                name = "Comisión sin Factura TC %s" % (number_liquidation) + name_recap
+                name = "Commission without Invoice Credit Card %s" % (number_liquidation) + name_recap
                 aml_model.with_context(check_move_validity=False).create(
-                    liquidation._prepare_move_line_vals(
-                        am,
-                        liquidation.account_commission_id,
-                        name,
-                        credit=liquidation.commission_wo_invoice,
-                        partner=liquidation.partner_id,
-                    )
+                    liquidation._prepare_move_line_vals(am, liquidation.partner_id.property_account_payable_id, name,
+                                                        credit=liquidation.commission_wo_invoice,
+                                                        partner=liquidation.partner_id, )
                 )
             if liquidation.commission or liquidation.commission_iva:
                 for invoice_id in invoice_to_liquidate.keys():
-                    amount_line = (liquidation.commission_iva or 0.0) + (
-                            liquidation.commission + 0.0
-                    )
+                    amount_line = (liquidation.commission_iva or 0.0) + (liquidation.commission + 0.0)
                     if multi_invoice:
-                        amount_line = invoice_to_liquidate[invoice_id].get(
-                            "amount_to_concile", 0.0
-                        )
-                    name = (
-                            "Comision Liquidación TC %s" % (number_liquidation) + name_recap
-                    )
+                        amount_line = invoice_to_liquidate[invoice_id].get("amount_to_concile", 0.0)
+                    name = ("Commission Credit Card Liquidation %s" % (number_liquidation) + name_recap)
                     aml = aml_model.with_context(check_move_validity=False).create(
-                        liquidation._prepare_move_line_vals(
-                            am,
-                            liquidation.account_commission_id,
-                            name,
-                            debit=amount_line,
-                            partner=liquidation.partner_id,
-                        )
-                    )
+                        liquidation._prepare_move_line_vals(am, liquidation.partner_id.property_account_payable_id,
+                                                            name, debit=amount_line, partner=liquidation.partner_id, ))
                     invoice_to_liquidate[invoice_id]["amls_to_concile"].append(aml.id)
-            # crear apuntes agrupados o por cada recap
-            # segun lo que el usuario haya seleccionado
+            # Create grouped entries or per recap
+            # depending on what the user has selected
             if liquidation.split_lines_by_recap:
                 for line in liquidation.line_ids:
                     payment_account_id = liquidation.journal_id.default_debit_account_id
-                    name = _("Valor Neto Liquidación TC: %s Recap: %s") % (
-                        number_liquidation,
-                        line.recap_id.name or "",
-                    )
+                    name = _("Net Value Credit Card Liquidation: %s Recap: %s") % (
+                        number_liquidation, line.recap_id.name or "",)
                     aml_model.with_context(check_move_validity=False).create(
-                        liquidation._prepare_move_line_vals(
-                            am,
-                            payment_account_id,
-                            name,
-                            credit=line.net_value,
-                            partner=liquidation.partner_id,
-                        )
-                    )
+                        liquidation._prepare_move_line_vals(am, payment_account_id, name, debit=line.net_value,
+                                                            partner=liquidation.partner_id, ))
 
             elif liquidation.net_value:
                 pmls = liquidation.journal_id.inbound_payment_method_line_ids
@@ -597,56 +468,34 @@ class AccountCreditCardLiquidation(models.Model):
 
                 payment_account_id = pmls.payment_account_id[:1] or default_payment_account
 
-                name = (
-                        _("Valor Neto Liquidación TC %s") % (number_liquidation)
-                        + name_recap
-                )
-                value = liquidation.base
-                if not liquidation.no_withhold:
-                    value = liquidation.net_value + (liquidation.commission_iva or 0.0) + (
-                            liquidation.commission + 0.0)
+                name = (_("Net Value Credit Card Liquidation %s") % (number_liquidation) + name_recap)
+                value = liquidation.net_value
                 aml_model.with_context(check_move_validity=False).create(
                     liquidation._prepare_move_line_vals(
                         am,
                         payment_account_id,
                         name,
-                        credit=value,
+                        debit=value,
                         partner=liquidation.partner_id,
                     )
                 )
             if liquidation.no_invoice and total_comission > 0:
-                name = "Comisión TC %s" % (number_liquidation) + name_recap
+                name = "Commission Credit Card %s" % (number_liquidation) + name_recap
                 aml_model.with_context(check_move_validity=False).create(
-                    liquidation._prepare_move_line_vals(
-                        am,
-                        liquidation.account_commission_expense_id,
-                        name,
-                        credit=total_comission,
-                        partner=liquidation.partner_id,
-                    )
-                )
+                    liquidation._prepare_move_line_vals(am, liquidation.account_commission_expense_id, name,
+                                                        credit=total_comission, partner=liquidation.partner_id, ))
             if liquidation.no_withhold and liquidation.rent_withhold > 0:
-                name = "Retencion I.R. TC %s" % (number_liquidation) + name_recap
+                name = "Income Tax Withholding Credit Card %s" % (number_liquidation) + name_recap
                 aml_model.with_context(check_move_validity=False).create(
-                    liquidation._prepare_move_line_vals(
-                        am,
-                        liquidation.account_withhold_rent_id,
-                        name,
-                        debit=liquidation.rent_withhold,
-                        partner=liquidation.partner_id,
-                    )
-                )
+                    liquidation._prepare_move_line_vals(am, liquidation.account_withhold_rent_id, name,
+                                                        debit=liquidation.rent_withhold,
+                                                        partner=liquidation.partner_id, ))
             if liquidation.no_withhold and liquidation.iva_withhold > 0:
-                name = "Retención I.V.A. TC %s" % (number_liquidation) + name_recap
+                name = "VAT Withholding Credit Card %s" % (number_liquidation) + name_recap
                 aml_model.with_context(check_move_validity=False).create(
-                    liquidation._prepare_move_line_vals(
-                        am,
-                        liquidation.account_withhold_iva_id,
-                        name,
-                        debit=liquidation.iva_withhold,
-                        partner=liquidation.partner_id,
-                    )
-                )
+                    liquidation._prepare_move_line_vals(am, liquidation.account_withhold_iva_id, name,
+                                                        debit=liquidation.iva_withhold,
+                                                        partner=liquidation.partner_id, ))
             am.action_post()
             if not liquidation.no_invoice and invoice_to_liquidate:
                 for invoice_id in invoice_to_liquidate.keys():
@@ -721,28 +570,34 @@ class AccountCreditCardLiquidation(models.Model):
 
         dummy, account = self._tax_compute_all_helper(1.0, self.tax_id_ret)
         vals_base_line = {
-            **self._get_move_line_default_values(self.rent_withhold, True),
+            **self._get_move_line_default_values(self.rent_base, False),
             'name': 'Base Ret: ' + self.tax_id_ret.name,
             'tax_ids': [Command.set(self.tax_id_ret.ids)],
             'account_id': account,
         }
+        vals_base_line_counterpart = {
+            **self._get_move_line_default_values(self.rent_base, True),  # Counterpart 0 operation
+            'name': 'Base Ret Cont: ' + self.tax_id_ret.name,
+            'account_id': account,
+        }
+        total_lines.append(vals_base_line_counterpart)
         total_lines.append(vals_base_line)
         dummy, account = self._tax_compute_all_helper(1.0, self.tax_id_vat)
         vals_base_line = {
-            **self._get_move_line_default_values(self.iva_withhold, True),
+            **self._get_move_line_default_values(self.base, False),
             'name': 'Base Ret: ' + self.tax_id_vat.name,
             'tax_ids': [Command.set(self.tax_id_vat.ids)],
             'account_id': account,
         }
+        vals_base_line_counterpart = {
+            **self._get_move_line_default_values(self.base, True),  # Counterpart 0 operation
+            'name': 'Base Ret Cont: ' + self.tax_id_ret.name,
+            'account_id': account,
+        }
+        total_lines.append(vals_base_line_counterpart)
         total_lines.append(vals_base_line)
-
-        pmls = self.journal_id.inbound_payment_method_line_ids
-        default_payment_account = self.company_id.account_journal_payment_debit_account_id
-
-        payment_account_id = pmls.payment_account_id[:1] or default_payment_account
-
+        payment_account_id = self.account_id
         amount = self.iva_withhold + self.rent_withhold
-
         vals = {
             **self._get_move_line_default_values(amount, False),
             'name': _('Withhold on: %s') % self.number,
