@@ -47,13 +47,7 @@ class AccountCreditCardLiquidation(models.Model):
         readonly=True,
         states=_STATES_DOC,
     )
-    account_commission_id = fields.Many2one(
-        comodel_name="account.account",
-        string="Commission Account(CC)",
-        required=True,
-        readonly=True,
-        states=_STATES_DOC,
-    )
+
     journal_id = fields.Many2one(
         comodel_name="account.journal",
         string="Dest. Journal",
@@ -208,13 +202,13 @@ class AccountCreditCardLiquidation(models.Model):
     )
     def _compute_liquidation_values(self):
         for liquidation in self:
-            base = sum(liquidation._get_lines_values("base"))
-            commission = sum(liquidation._get_lines_values("commission"))
-            commission_iva = sum(liquidation._get_lines_values("commission_iva"))
-            iva_withhold = sum(liquidation._get_lines_values("iva_withhold"))
-            rent_base = sum(liquidation._get_lines_values("rent_base"))
-            rent_withhold = sum(liquidation._get_lines_values("rent_withhold"))
-            net_value = sum(liquidation._get_lines_values("net_value")) - liquidation.commission_wo_invoice
+            base = liquidation._get_lines_values("base")
+            commission = liquidation._get_lines_values("commission")
+            commission_iva = liquidation._get_lines_values("commission_iva")
+            iva_withhold = liquidation._get_lines_values("iva_withhold")
+            rent_base = liquidation._get_lines_values("rent_base")
+            rent_withhold = liquidation._get_lines_values("rent_withhold")
+            net_value = liquidation._get_lines_values("net_value") - liquidation.commission_wo_invoice
             liquidation._set_values(base, commission, commission_iva, iva_withhold, rent_base, rent_withhold, net_value)
 
     def _get_lines_values(self, field):
@@ -483,9 +477,9 @@ class AccountCreditCardLiquidation(models.Model):
                     "date": liquidation.date_account,
                 }
             )
-            if not liquidation.account_commission_id:
+            if not liquidation.partner_id.property_account_payable_id:
                 raise UserError(
-                    _("Debe configurar la cuenta  de comiciones")
+                    _("Debe configurar la cuenta  de pagos de proveedor")
                 )
             # Si se va a saldar una factura deberia solo tomar el parcial
             # Valor de base que se debe sacar de la cuenta contable
@@ -496,9 +490,7 @@ class AccountCreditCardLiquidation(models.Model):
             if liquidation.base:
                 base = liquidation.base
                 if not liquidation.no_withhold:
-                    amount_line = ((liquidation.commission_iva or 0.0)
-                                   + (liquidation.commission + 0.0)
-                                   + (liquidation.rent_withhold or 0.0)
+                    amount_line = ((liquidation.rent_withhold or 0.0)
                                    + (liquidation.iva_withhold or 0.0))
                     base = base - amount_line
 
@@ -517,7 +509,7 @@ class AccountCreditCardLiquidation(models.Model):
                 aml_model.with_context(check_move_validity=False).create(
                     liquidation._prepare_move_line_vals(
                         am,
-                        liquidation.account_commission_id,
+                        liquidation.partner_id.property_account_payable_id,
                         name,
                         credit=liquidation.commission_wo_invoice,
                         partner=liquidation.partner_id,
@@ -538,7 +530,7 @@ class AccountCreditCardLiquidation(models.Model):
                     aml = aml_model.with_context(check_move_validity=False).create(
                         liquidation._prepare_move_line_vals(
                             am,
-                            liquidation.account_commission_id,
+                            liquidation.partner_id.property_account_payable_id,
                             name,
                             debit=amount_line,
                             partner=liquidation.partner_id,
@@ -575,9 +567,6 @@ class AccountCreditCardLiquidation(models.Model):
                         + name_recap
                 )
                 value = liquidation.net_value
-                if not liquidation.no_withhold:
-                    value = value - (liquidation.commission_iva or 0.0) - (
-                            liquidation.commission + 0.0)
                 aml_model.with_context(check_move_validity=False).create(
                     liquidation._prepare_move_line_vals(
                         am,
@@ -694,7 +683,7 @@ class AccountCreditCardLiquidation(models.Model):
 
         dummy, account = self._tax_compute_all_helper(1.0, self.tax_id_ret)
         vals_base_line = {
-            **self._get_move_line_default_values(self.rent_withhold, True),
+            **self._get_move_line_default_values(self.base, True),
             'name': 'Base Ret: ' + self.tax_id_ret.name,
             'tax_ids': [Command.set(self.tax_id_ret.ids)],
             'account_id': account,
@@ -702,20 +691,14 @@ class AccountCreditCardLiquidation(models.Model):
         total_lines.append(vals_base_line)
         dummy, account = self._tax_compute_all_helper(1.0, self.tax_id_vat)
         vals_base_line = {
-            **self._get_move_line_default_values(self.iva_withhold, True),
+            **self._get_move_line_default_values(self.base, True),
             'name': 'Base Ret: ' + self.tax_id_vat.name,
             'tax_ids': [Command.set(self.tax_id_vat.ids)],
             'account_id': account,
         }
         total_lines.append(vals_base_line)
-
-        pmls = self.journal_id.inbound_payment_method_line_ids
-        default_payment_account = self.company_id.account_journal_payment_debit_account_id
-
-        payment_account_id = pmls.payment_account_id[:1] or default_payment_account
-
+        payment_account_id = self.account_id
         amount = self.iva_withhold + self.rent_withhold
-
         vals = {
             **self._get_move_line_default_values(amount, False),
             'name': _('Withhold on: %s') % self.number,
