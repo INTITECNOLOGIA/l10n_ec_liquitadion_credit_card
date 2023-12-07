@@ -52,7 +52,12 @@
                             <field name="payment_line_ids" colspan="4"/>
                         </page>
                         <page string="Lines Conciled">
-                            <field name="liquidation_line_ids" colspan="4"/>
+                            <field name="liquidation_line_ids" colspan="4">
+                                <tree>
+                                    <field name="liquidation_id" />
+                                </tree>
+                            </field>
+
                         </page>
                     </notebook>
                 </sheet>

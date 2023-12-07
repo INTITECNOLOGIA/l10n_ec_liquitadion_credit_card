@@ -135,11 +135,13 @@ class AccountCreditCardLiquidation(models.Model):
     account_withhold_rent_id = fields.Many2one(
         comodel_name="account.account",
         string="Rent Withhold Account",
+        domain=[("account_type", "=", 'liability_current')],
         states=_STATES_DOC,
     )
     account_withhold_iva_id = fields.Many2one(
         comodel_name="account.account",
         string="VAT Withhold Account",
+        domain=[("account_type", "=", 'liability_current')],
         states=_STATES_DOC,
     )
     account_commission_expense_id = fields.Many2one(

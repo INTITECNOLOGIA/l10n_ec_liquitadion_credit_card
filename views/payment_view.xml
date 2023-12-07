@@ -23,10 +23,10 @@
                             name="l10n_ec_recap_id"
                             attrs="{'invisible': [('l10n_ec_recap_id', '=', False)]}"
                     />
-                    <field
-                            name="l10n_ec_authorization_cc"
-                            attrs="{'invisible': [('is_payment_tc', '=', False)], 'required': [('is_payment_tc', '=', True)]}"
-                    />
+<!--                    <field-->
+<!--                            name="l10n_ec_authorization_cc"-->
+<!--                            attrs="{'invisible': [('is_payment_tc', '=', False)], 'required': [('is_payment_tc', '=', True)]}"-->
+<!--                    />-->
                     <field
                             name="l10n_ec_authorizer_id"
                             options="{'no_create': True}"
@@ -42,10 +42,10 @@
                             options="{'no_create': True}"
                             attrs="{'invisible': [('is_payment_tc', '=', False)], 'required': [('is_payment_tc', '=', True)]}"
                     />
-                    <field
-                            name="l10n_ec_voucher_type"
-                            attrs="{'invisible': [('is_payment_tc', '=', False)], 'required': [('is_payment_tc', '=', True)]}"
-                    />
+<!--                    <field-->
+<!--                            name="l10n_ec_voucher_type"-->
+<!--                            attrs="{'invisible': [('is_payment_tc', '=', False)], 'required': [('is_payment_tc', '=', True)]}"-->
+<!--                    />-->
                     <field
                             name="l10n_ec_voucher_number"
                             attrs="{'invisible': [('is_payment_tc', '=', False)], 'required': [('is_payment_tc', '=', True)]}"
@@ -75,10 +75,10 @@
                             name="l10n_ec_recap_id"
                             attrs="{'invisible': [('l10n_ec_recap_id', '=', False)]}"
                     />
-                    <field
-                            name="l10n_ec_authorization_cc"
-                            attrs="{'invisible': [('is_payment_tc', '=', False)], 'required': [('is_payment_tc', '=', True)]}"
-                    />
+<!--                    <field-->
+<!--                            name="l10n_ec_authorization_cc"-->
+<!--                            attrs="{'invisible': [('is_payment_tc', '=', False)], 'required': [('is_payment_tc', '=', True)]}"-->
+<!--                    />-->
                     <field
                             name="l10n_ec_authorizer_id"
                             options="{'no_create': True}"
@@ -94,10 +94,10 @@
                             options="{'no_create': True}"
                             attrs="{'invisible': [('is_payment_tc', '=', False)], 'required': [('is_payment_tc', '=', True)]}"
                     />
-                    <field
-                            name="l10n_ec_voucher_type"
-                            attrs="{'invisible': [('is_payment_tc', '=', False)], 'required': [('is_payment_tc', '=', True)]}"
-                    />
+<!--                    <field-->
+<!--                            name="l10n_ec_voucher_type"-->
+<!--                            attrs="{'invisible': [('is_payment_tc', '=', False)], 'required': [('is_payment_tc', '=', True)]}"-->
+<!--                    />-->
                     <field
                             name="l10n_ec_voucher_number"
                             attrs="{'invisible': [('is_payment_tc', '=', False)], 'required': [('is_payment_tc', '=', True)]}"

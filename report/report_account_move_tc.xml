@@ -88,7 +88,7 @@
                                     />
                                 </t>
                                 <t
-                                        t-foreach="o.withhold_id.move_id.line_ids"
+                                        t-foreach="o.withhold_id.line_ids"
                                         t-as="line"
                                 >
                                     <tr>

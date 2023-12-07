@@ -19,82 +19,67 @@ msgstr ""
 #: model:ir.model.fields,field_description:l10n_ec_liquitadion_credit_card.field_account_payment__l10n_ec_voucher_batch_number
 #: model:ir.model.fields,field_description:l10n_ec_liquitadion_credit_card.field_account_payment_register__l10n_ec_voucher_batch_number
 msgid "# Batch/RECAP"
-msgstr "# Por lotes/resumen"
-
-#. module: l10n_ec_liquitadion_credit_card
-#: model:ir.actions.report,print_report_name:l10n_ec_liquitadion_credit_card.action_report_credit_card_move_pdf
-msgid "'%s - %s' % (object.number, object.partner_id.name or '')"
-msgstr "' %s - %s' %(object.number, object.partner_id.name o '')"
-
-#. module: l10n_ec_liquitadion_credit_card
-#: model:ir.actions.report,print_report_name:l10n_ec_liquitadion_credit_card.action_report_credit_card_liquidation_pdf
-msgid ""
-"'Credit Card Liquidation %s - %s' % (object.number or '',\n"
-"            object.partner_id.name)\n"
-"        "
-msgstr ""
-"'Liquidación de la tarjeta de crédito %S - %s' %(objeto. Number o '',\n"
-"            Object.partner_id.name)"
+msgstr "# Lote"
 
 #. module: l10n_ec_liquitadion_credit_card
 #: model_terms:ir.ui.view,arch_db:l10n_ec_liquitadion_credit_card.report_credit_card_liquidation
 msgid "<strong>ACCOUNTING DATE:</strong>"
-msgstr "<strong> Fecha de contabilidad: </strong>"
+msgstr "<strong> Fecha contable: </strong>"
 
 #. module: l10n_ec_liquitadion_credit_card
 #: model_terms:ir.ui.view,arch_db:l10n_ec_liquitadion_credit_card.report_credit_card_move_lines
 msgid "<strong>Account</strong>"
-msgstr "<strong> cuenta </strong>"
+msgstr "<strong> Cuenta </strong>"
 
 #. module: l10n_ec_liquitadion_credit_card
 #: model_terms:ir.ui.view,arch_db:l10n_ec_liquitadion_credit_card.report_credit_card_move_lines
 msgid "<strong>Credit</strong>"
-msgstr "<strong> crédito </strong>"
+msgstr "<strong> Crédito </strong>"
 
 #. module: l10n_ec_liquitadion_credit_card
 #: model_terms:ir.ui.view,arch_db:l10n_ec_liquitadion_credit_card.report_credit_card_move_lines
 msgid "<strong>Date :</strong>"
-msgstr "<strong> fecha: </strong>"
+msgstr "<strong> Fecha: </strong>"
 
 #. module: l10n_ec_liquitadion_credit_card
 #: model_terms:ir.ui.view,arch_db:l10n_ec_liquitadion_credit_card.report_credit_card_move_lines
 msgid "<strong>Debit</strong>"
-msgstr "<strong> débito </strong>"
+msgstr "<strong> Débito </strong>"
 
 #. module: l10n_ec_liquitadion_credit_card
 #: model_terms:ir.ui.view,arch_db:l10n_ec_liquitadion_credit_card.report_credit_card_move_lines
 msgid "<strong>Journal :</strong>"
-msgstr "<strong> diario: </strong>"
+msgstr "<strong> Diario: </strong>"
 
 #. module: l10n_ec_liquitadion_credit_card
 #: model_terms:ir.ui.view,arch_db:l10n_ec_liquitadion_credit_card.report_credit_card_move_lines
 msgid "<strong>Journal Entry :</strong>"
-msgstr "<strong> Entrada en el diario: </strong>"
+msgstr "<strong> Asiento Contable: </strong>"
 
 #. module: l10n_ec_liquitadion_credit_card
 #: model_terms:ir.ui.view,arch_db:l10n_ec_liquitadion_credit_card.report_credit_card_move_lines
 msgid "<strong>Journal Entry</strong>"
-msgstr "<strong> Entrada en el diario </strong>"
+msgstr "<strong> Asiento Contable </strong>"
 
 #. module: l10n_ec_liquitadion_credit_card
 #: model_terms:ir.ui.view,arch_db:l10n_ec_liquitadion_credit_card.report_credit_card_move_lines
 msgid "<strong>Label</strong>"
-msgstr "<strong> etiqueta </strong>"
+msgstr "<strong> Etiqueta </strong>"
 
 #. module: l10n_ec_liquitadion_credit_card
 #: model_terms:ir.ui.view,arch_db:l10n_ec_liquitadion_credit_card.report_credit_card_move_lines
 msgid "<strong>Reference :</strong>"
-msgstr "<strong> referencia: </strong>"
+msgstr "<strong> Referencia: </strong>"
 
 #. module: l10n_ec_liquitadion_credit_card
 #: model_terms:ir.ui.view,arch_db:l10n_ec_liquitadion_credit_card.report_credit_card_liquidation
 msgid "<strong>SUPPLIER:</strong>"
-msgstr "<strong> proveedor: </strong>"
+msgstr "<strong> Proveedor: </strong>"
 
 #. module: l10n_ec_liquitadion_credit_card
 #: model_terms:ir.ui.view,arch_db:l10n_ec_liquitadion_credit_card.report_credit_card_move_lines
 msgid "<strong>Total:</strong>"
-msgstr "<strong> total: </strong>"
+msgstr "<strong> Total: </strong>"
 
 #. module: l10n_ec_liquitadion_credit_card
 #: model:ir.model.fields,field_description:l10n_ec_liquitadion_credit_card.field_account_credit_card_liquidation_line__account_id
@@ -109,7 +94,7 @@ msgstr "Liquidación de la tarjeta de crédito de la cuenta"
 #. module: l10n_ec_liquitadion_credit_card
 #: model:ir.model.fields,field_description:l10n_ec_liquitadion_credit_card.field_account_credit_card_liquidation__move_id
 msgid "Account Journal"
-msgstr "Diario de cuentas"
+msgstr "Asiento Contable"
 
 #. module: l10n_ec_liquitadion_credit_card
 #: model:ir.model.fields,field_description:l10n_ec_liquitadion_credit_card.field_account_credit_card_liquidation__account_commission_id
@@ -124,7 +109,7 @@ msgstr "Movimiento de cuenta"
 #. module: l10n_ec_liquitadion_credit_card
 #: model:ir.model.fields,field_description:l10n_ec_liquitadion_credit_card.field_account_credit_card_liquidation__date_account
 msgid "Accounting Date"
-msgstr "Fecha de contabilidad"
+msgstr "Fecha contable"
 
 #. module: l10n_ec_liquitadion_credit_card
 #: model:ir.model.fields,field_description:l10n_ec_liquitadion_credit_card.field_account_credit_card_liquidation__additional_lines_ids
@@ -146,7 +131,7 @@ msgstr "Cantidad neta"
 #. module: l10n_ec_liquitadion_credit_card
 #: model:ir.model.fields,field_description:l10n_ec_liquitadion_credit_card.field_account_payment_recap__amount_not_reconciled
 msgid "Amount not reconciled"
-msgstr "Cantidad no reconciliada"
+msgstr "Cantidad no conciliada"
 
 #. module: l10n_ec_liquitadion_credit_card
 #: model:ir.model.fields,field_description:l10n_ec_liquitadion_credit_card.field_account_credit_card_liquidation_invoice_detail__amount
@@ -169,7 +154,7 @@ msgstr "Aprobar"
 #: model:ir.model.fields,field_description:l10n_ec_liquitadion_credit_card.field_account_payment_register__l10n_ec_authorizer_id
 #: model:ir.ui.menu,name:l10n_ec_liquitadion_credit_card.account_credit_card_authorizer_menu
 msgid "Authorizer"
-msgstr "Autorizador "
+msgstr "Autorizadores "
 
 #. module: l10n_ec_liquitadion_credit_card
 #: model:ir.model.fields.selection,name:l10n_ec_liquitadion_credit_card.selection__account_credit_card_liquidation__document_type__auto_printer
@@ -224,7 +209,7 @@ msgstr "Por lotes / resumen"
 #. module: l10n_ec_liquitadion_credit_card
 #: model_terms:ir.ui.view,arch_db:l10n_ec_liquitadion_credit_card.report_credit_card_liquidation
 msgid "CREDIT CARD LIQUIDATION REPORT"
-msgstr "Informe de liquidación de tarjeta de crédito"
+msgstr "Informe Liquidación Tarjeta de Crédito"
 
 #. module: l10n_ec_liquitadion_credit_card
 #: model:ir.model.fields.selection,name:l10n_ec_liquitadion_credit_card.selection__account_credit_card_liquidation__state__cancel
@@ -360,7 +345,7 @@ msgstr "Liquidación de la tarjeta de crédito"
 #. module: l10n_ec_liquitadion_credit_card
 #: model:ir.actions.report,name:l10n_ec_liquitadion_credit_card.action_report_credit_card_liquidation_pdf
 msgid "Credit Card Liquidation (PDF)"
-msgstr "Liquidación de la tarjeta de crédito (PDF)"
+msgstr "Liquidación tarjeta de crédito (PDF)"
 
 #. module: l10n_ec_liquitadion_credit_card
 #: model:ir.actions.report,name:l10n_ec_liquitadion_credit_card.action_report_credit_card_move_pdf
@@ -528,7 +513,7 @@ msgstr "Comisión IVA"
 #: model:ir.model.fields,field_description:l10n_ec_liquitadion_credit_card.field_account_credit_card_liquidation_line__iva_withhold
 #: model_terms:ir.ui.view,arch_db:l10n_ec_liquitadion_credit_card.account_credit_card_liquidation_form_view
 msgid "IVA Withhold"
-msgstr "IVA RETIR"
+msgstr "Retención IVA"
 
 #. module: l10n_ec_liquitadion_credit_card
 #: model:ir.model.fields,field_description:l10n_ec_liquitadion_credit_card.field_account_credit_card_liquidation__percentage_ret_iva
@@ -573,7 +558,7 @@ msgstr "Nombre del emisor"
 #. module: l10n_ec_liquitadion_credit_card
 #: model_terms:ir.ui.view,arch_db:l10n_ec_liquitadion_credit_card.report_credit_card_liquidation
 msgid "Iva Withhold"
-msgstr "IVA RETIR"
+msgstr "Ret IVA"
 
 #. module: l10n_ec_liquitadion_credit_card
 #: model:ir.model,name:l10n_ec_liquitadion_credit_card.model_account_journal
@@ -659,7 +644,7 @@ msgstr "Liquidación"
 #. module: l10n_ec_liquitadion_credit_card
 #: model_terms:ir.ui.view,arch_db:l10n_ec_liquitadion_credit_card.report_credit_card_liquidation
 msgid "Lot/ RECAP"
-msgstr "Lote/ resumen"
+msgstr "Lote"
 
 #. module: l10n_ec_liquitadion_credit_card
 #: model:ir.model.fields,field_description:l10n_ec_liquitadion_credit_card.field_account_credit_card_liquidation_line__recap_id
@@ -697,12 +682,12 @@ msgstr "Valor neto Liquidación de la tarjeta de crédito: %s Recap: %s"
 #. module: l10n_ec_liquitadion_credit_card
 #: model:ir.model.fields,field_description:l10n_ec_liquitadion_credit_card.field_account_credit_card_liquidation__no_withhold
 msgid "No Input Withhold?"
-msgstr "¿Sin retención de entrada?"
+msgstr "No crear retención"
 
 #. module: l10n_ec_liquitadion_credit_card
 #: model:ir.model.fields,field_description:l10n_ec_liquitadion_credit_card.field_account_credit_card_liquidation__no_invoice
 msgid "No Reconcile Invoice?"
-msgstr "¿No hay factura de reconciliación?"
+msgstr "¿No hay factura de conciliación?"
 
 #. module: l10n_ec_liquitadion_credit_card
 #: model_terms:ir.ui.view,arch_db:l10n_ec_liquitadion_credit_card.report_credit_card_liquidation
@@ -758,7 +743,7 @@ msgstr "RECAP/LOTE"
 #. module: l10n_ec_liquitadion_credit_card
 #: model:ir.ui.menu,name:l10n_ec_liquitadion_credit_card.account_payment_recap_menu
 msgid "Recap/Lotes"
-msgstr "Pick/Lotes"
+msgstr "Lotes"
 
 #. module: l10n_ec_liquitadion_credit_card
 #: model:ir.actions.act_window,name:l10n_ec_liquitadion_credit_card.action_account_payment_recap_tree_view
@@ -776,7 +761,7 @@ msgstr "Registro de pago"
 #: model_terms:ir.ui.view,arch_db:l10n_ec_liquitadion_credit_card.account_credit_card_liquidation_form_view
 #: model_terms:ir.ui.view,arch_db:l10n_ec_liquitadion_credit_card.report_credit_card_liquidation
 msgid "Rent Base"
-msgstr "Base de alquiler"
+msgstr "Base de retención"
 
 #. module: l10n_ec_liquitadion_credit_card
 #: model:ir.model.fields,field_description:l10n_ec_liquitadion_credit_card.field_account_credit_card_liquidation__rent_withhold
@@ -784,12 +769,12 @@ msgstr "Base de alquiler"
 #: model_terms:ir.ui.view,arch_db:l10n_ec_liquitadion_credit_card.account_credit_card_liquidation_form_view
 #: model_terms:ir.ui.view,arch_db:l10n_ec_liquitadion_credit_card.report_credit_card_liquidation
 msgid "Rent Withhold"
-msgstr "Retención de alquiler"
+msgstr "Ret. Renta"
 
 #. module: l10n_ec_liquitadion_credit_card
 #: model:ir.model.fields,field_description:l10n_ec_liquitadion_credit_card.field_account_credit_card_liquidation__account_withhold_rent_id
 msgid "Rent Withhold Account"
-msgstr "Cuenta de retención de alquiler"
+msgstr "Cuenta de retención de renta"
 
 #. module: l10n_ec_liquitadion_credit_card
 #: model:ir.model.fields,field_description:l10n_ec_liquitadion_credit_card.field_account_credit_card_liquidation__percentage_ret_rent
@@ -831,7 +816,7 @@ msgstr "¿Saltar el pago?"
 #. module: l10n_ec_liquitadion_credit_card
 #: model:ir.model.fields,field_description:l10n_ec_liquitadion_credit_card.field_account_credit_card_liquidation__split_lines_by_recap
 msgid "Split Journal by RECAP?"
-msgstr "¿Diario dividido por recapitulación?"
+msgstr "¿Dividir diario por lotes?"
 
 #. module: l10n_ec_liquitadion_credit_card
 #: model:ir.model.fields,field_description:l10n_ec_liquitadion_credit_card.field_account_credit_card_liquidation__state
@@ -899,7 +884,7 @@ msgstr "IVA retención de tarjeta de crédito %s"
 #. module: l10n_ec_liquitadion_credit_card
 #: model_terms:ir.ui.view,arch_db:l10n_ec_liquitadion_credit_card.report_credit_card_liquidation
 msgid "VAT commission"
-msgstr "Comisión de IVA"
+msgstr "Comisión IVA"
 
 #. module: l10n_ec_liquitadion_credit_card
 #: model_terms:ir.ui.view,arch_db:l10n_ec_liquitadion_credit_card.account_credit_card_liquidation_form_view
@@ -910,7 +895,7 @@ msgstr "Valor Neto"
 #: model:ir.model.fields,field_description:l10n_ec_liquitadion_credit_card.field_account_payment__l10n_ec_voucher_number
 #: model:ir.model.fields,field_description:l10n_ec_liquitadion_credit_card.field_account_payment_register__l10n_ec_voucher_number
 msgid "Voucher Number"
-msgstr "Número de Vales"
+msgstr "Número de Voucher"
 
 #. module: l10n_ec_liquitadion_credit_card
 #: model:ir.model.fields,field_description:l10n_ec_liquitadion_credit_card.field_account_payment__l10n_ec_voucher_type
@@ -921,7 +906,7 @@ msgstr "Tipo de cupón"
 #. module: l10n_ec_liquitadion_credit_card
 #: model:ir.model.fields,field_description:l10n_ec_liquitadion_credit_card.field_account_credit_card_liquidation__withhold_id
 msgid "Withhold"
-msgstr "Retener"
+msgstr "Retención"
 
 #. module: l10n_ec_liquitadion_credit_card
 #: model:ir.model.fields,field_description:l10n_ec_liquitadion_credit_card.field_account_credit_card_liquidation__issue_date

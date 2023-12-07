@@ -110,7 +110,8 @@
                                attrs="{'required': [('no_invoice', '=', True)], 'invisible': [('no_invoice', '=', False)]}"/>
                         <field name="invoice_id" options="{'no_create': True}"
                                attrs="{'invisible': [('no_invoice', '=', True)]}"
-                               domain="[('partner_id', '=', partner_id), ('move_type', '=', 'in_invoice'), ('state','=' ,'posted')]"/>
+                               domain="[('partner_id', '=', partner_id), ('move_type', '=', 'in_invoice'),
+                               ('state','=' ,'posted'), ('payment_state','in' ,('partial', 'not_paid'))]"/>
                         <field name="commission_wo_invoice" attrs="{'invisible': [('no_invoice', '=', False)]}"/>
                         <field name="account_commission_id" options="{'no_create': True}"
                                attrs="{'invisible': [('commission_wo_invoice', '=', 0.0)], 'required': [('commission_wo_invoice', '!=', 0.0)]}"/>

@@ -9,9 +9,9 @@
         <field name="name">Credit Card Move (PDF)</field>
         <field name="model">account.credit.card.liquidation</field>
         <field name="report_type">qweb-pdf</field>
-        <field name="report_name">l10n_ec_credit_card_liquidation.report_credit_card_move_lines</field>
-        <field name="report_file">l10n_ec_credit_card_liquidation.report_credit_card_move_lines</field>
-        <field name="print_report_name">'%s - %s' % (object.number, object.partner_id.name or '')</field>
+        <field name="report_name">l10n_ec_liquitadion_credit_card.report_credit_card_move_lines</field>
+        <field name="report_file">l10n_ec_liquitadion_credit_card.report_credit_card_move_lines</field>
+        <field name="print_report_name">'%s - %s' % (object.number, object.partner_id.name)</field>
         <field name="binding_model_id" ref="model_account_credit_card_liquidation"/>
         <field name="binding_type">report</field>
     </record>
@@ -20,11 +20,10 @@
         <field name="name">Credit Card Liquidation (PDF)</field>
         <field name="model">account.credit.card.liquidation</field>
         <field name="report_type">qweb-pdf</field>
-        <field name="report_name">l10n_ec_credit_card_liquidation.report_credit_card_liquidation</field>
-        <field name="report_file">l10n_ec_credit_card_liquidation.report_credit_card_liquidation</field>
-        <field name="print_report_name">'Credit Card Liquidation %s - %s' % (object.number or '',
-            object.partner_id.name)
-        </field>
+        <field name="report_name">l10n_ec_liquitadion_credit_card.report_credit_card_liquidation</field>
+        <field name="report_file">l10n_ec_liquitadion_credit_card.report_credit_card_liquidation</field>
+<!--        <field name="print_report_name">'Credit Card Liquidation %s' % (object.number)-->
+<!--        </field>-->
         <field name="binding_model_id" ref="model_account_credit_card_liquidation"/>
         <field name="binding_type">report</field>
     </record>
