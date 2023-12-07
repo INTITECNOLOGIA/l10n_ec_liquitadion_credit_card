@@ -536,6 +536,8 @@ class AccountCreditCardLiquidation(models.Model):
             'move_type': 'entry',
             'l10n_ec_withhold_foreign_regime': False,
             'ref': f"Ret {self.document_number}",
+            'liquidation_id': self.id,
+            'l10n_ec_authorization_number': self.electronic_authorization
         }
         return vals
 

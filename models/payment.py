@@ -338,3 +338,12 @@ class AccountPayment(models.Model):
             "authorizer_id": self.l10n_ec_authorizer_id.id,
             "state": "draft",
         }
+
+
+class AccountMove(models.Model):
+    _inherit = 'account.move'
+
+    liquidation_id = fields.Many2one(
+        comodel_name="account.credit.card.liquidation",
+        string="Liquidación de TC",
+    )
