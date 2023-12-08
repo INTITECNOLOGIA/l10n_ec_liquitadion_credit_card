@@ -1,10 +1,20 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo noupdate="1">
+
+    <data>
+
+        <record id="group_liquidation_credit_card" model="res.groups">
+            <field name="name">Permitir realizar liquidación de tarjetas de crédito</field>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+    </data>
+
     <record id="cc_liquidation_multi-company" model="ir.rule">
         <field name="name">Credit Card Liquidation Multi Company</field>
         <field
                 name="model_id"
-                ref="l10n_ec_credit_card_liquidation.model_account_credit_card_liquidation"
+                ref="l10n_ec_liquitadion_credit_card.model_account_credit_card_liquidation"
         />
         <field name="domain_force">
             ['|',('company_id','=',False),('company_id', 'in', company_ids)]
@@ -14,7 +24,7 @@
         <field name="name">Payment Recap Multi Company</field>
         <field
                 name="model_id"
-                ref="l10n_ec_credit_card_liquidation.model_account_payment_recap"
+                ref="l10n_ec_liquitadion_credit_card.model_account_payment_recap"
         />
         <field name="domain_force">
             ['|',('company_id','=',False),('company_id', 'in', company_ids)]

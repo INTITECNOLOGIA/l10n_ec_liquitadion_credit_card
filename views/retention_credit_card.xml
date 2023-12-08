@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <!--    <record id="l10n_ec_withhold_form_view" model="ir.ui.view">-->
+    <!--        <field name="name">l10n_ec.withhold.form</field>-->
+    <!--        <field name="model">l10n_ec.withhold</field>-->
+    <!--        <field name="priority" eval="50"/>-->
+    <!--        <field name="mode">primary</field>-->
+    <!--        <field name="inherit_id" ref="l10n_ec_niif.l10n_ec_withhold_form_view"/>-->
+    <!--        <field name="arch" type="xml">-->
+    <!--            <xpath expr="//field[@name='invoice_id']" position="after">-->
+    <!--                <field name="l10n_ec_credit_card_account_id"/>-->
+    <!--            </xpath>-->
+    <!--            <xpath expr="/form" position="attributes">-->
+    <!--                <attribute name="create">0</attribute>-->
+    <!--                <attribute name="edit">0</attribute>-->
+    <!--            </xpath>-->
+    <!--        </field>-->
+    <!--    </record>-->
+
+    <record id="view_move_withhold_tree_tc" model="ir.ui.view">
+        <field name="name">account.withhold.tree.tc</field>
+        <field name="model">account.move</field>
+        <field name="arch" type="xml">
+            <tree string="Retenciones" create="false" delete="false">
+                <field name="ref" string="Retención"/>
+                <field name="name"/>
+                <field name="liquidation_id"/>
+                <field name="partner_id"/>
+                <field name="l10n_ec_withhold_date"/>
+                <field name="journal_id"/>
+                <field name="l10n_ec_withhold_subtotals" widget="account-tax-totals-field-for-withhold"
+                       string="Totales"/>
+                <field name="state" widget="badge" decoration-success="state == 'posted'"
+                       decoration-info="state == 'draft'"/>
+            </tree>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="l10n_ec_withhold_credit_card_tree_view">
+        <field name="name">Retención Tarjeta de Crédito</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">account.move</field>
+        <field name="domain">[('liquidation_id', '!=', False)]</field>
+        <!--        <field name="context">{'liquidation_id': 'credit_card'}</field>-->
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_move_withhold_tree_tc"/>
+    </record>
+
+
+    <menuitem
+            id="account_withhold_credit_card_menu"
+            name="Retenciones TC"
+            parent="account_credit_card_main_menu"
+            action="l10n_ec_withhold_credit_card_tree_view"
+            sequence="20"/>
+
+    <record id="l10n_ec_withhold_line_credit_card_action" model="ir.actions.act_window">
+        <field name="name">Lineas Retención Tarjeta Crédito</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">account.move.line</field>
+        <field name="view_mode">tree,kanban,form,pivot</field>
+        <field name="domain">[('move_id.liquidation_id', '!=', False)]</field>
+    </record>
+
+    <menuitem
+            id="menu_l10n_ec_withhold_line_credit_card_action"
+            name="Lineas Retenciones TC"
+            parent="account_credit_card_main_menu"
+            action="l10n_ec_withhold_line_credit_card_action"
+            sequence="21"/>
+</odoo>

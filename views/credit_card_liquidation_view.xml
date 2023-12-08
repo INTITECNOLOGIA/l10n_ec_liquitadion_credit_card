@@ -319,9 +319,10 @@
         <field name="view_mode">tree,form</field>
         <field name="view_id" ref="account_credit_card_liquidation_tree_view"/>
     </record>
+
     <menuitem
             id="account_credit_card_liquidation_menu"
-            name="Liquidations"
+            name="Liquidaciones TC"
             parent="account_credit_card_main_menu"
             action="action_account_credit_card_liquidation_tree_view"
             sequence="20"
