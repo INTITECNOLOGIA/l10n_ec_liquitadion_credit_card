@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+
+    <record id="res_config_settings_view_form_liquidation" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.liquidation</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="account.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@id='default_accounts']" position="inside">
+                <div class="col-12 col-lg-6 o_setting_box" id="default_taxes_liquidation">
+
+
+                    <div class="o_setting_left_pane"/>
+                    <div class="o_setting_right_pane">
+                        <span class="o_form_label">Liquidación de Tarjetas de Crédito</span>
+                        <div class="row col-12 oe_grey">
+                            <ul>
+                                <li
+                                >Impuestos por defecto para retenciones de TC
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="content-group">
+                            <div class="row">
+                                <label for="tax_id_ret_liquidation"
+                                       class="col-lg-3 o_light_label"/>
+                                <field name="tax_id_ret_liquidation"
+                                       options="{'no_create': True}"
+                                       domain="[('tax_group_id.l10n_ec_type', 'in', ['withhold_income_sale'])]"/>
+                            </div>
+                            <div class="row">
+                                <label for="tax_id_vat_liquidation"
+                                       class="col-lg-3 o_light_label"/>
+                                <field name="tax_id_vat_liquidation"
+                                       options="{'no_create': True}"
+                                       domain="[('tax_group_id.l10n_ec_type', 'in', ['withhold_vat_sale'])]"/>
+                            </div>
+                            <!--                        <div class="row">-->
+                            <!--                            <label for="l10n_ec_withhold_credit_card_tax_id"-->
+                            <!--                                   class="col-lg-3 o_light_label"/>-->
+                            <!--                            <field name="l10n_ec_withhold_credit_card_tax_id"-->
+                            <!--                                   domain="[('tax_group_id.l10n_ec_type', '=', 'withhold_income_purchase'), ('company_id', '=', company_id)]"/>-->
+                            <!--                        </div>-->
+                            <!--                        <div class="row">-->
+                            <!--                            <label for="l10n_ec_withhold_agent_number"-->
+                            <!--                                   class="col-lg-3 o_light_label"/>-->
+                            <!--                            <field name="l10n_ec_withhold_agent_number"/>-->
+                            <!--                        </div>-->
+                        </div>
+                    </div>
+                </div>
+
+            </xpath>
+        </field>
+    </record>
+
+
+</odoo>

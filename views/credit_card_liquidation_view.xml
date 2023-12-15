@@ -105,7 +105,7 @@
 
                         <field name="no_withhold" invisible="1"/>
 
-                        <field name="no_invoice"/>
+                        <field name="no_invoice" invisible="1"/>
                         <field name="account_commission_expense_id" options="{'no_create': True}"
                                attrs="{'required': [('no_invoice', '=', True)], 'invisible': [('no_invoice', '=', False)]}"/>
                         <field name="invoice_id" options="{'no_create': True}"
@@ -128,7 +128,7 @@
                                             name="account_id"
                                             invisible="1"
                                     />
-                                    <field name="recap_id"/>
+                                    <field name="recap_id" options="{'no_create': True}"/>
                                     <field name="base" sum="Base"/>
                                     <field name="commission" sum="Comisión"/>
                                     <field name="commission_iva" sum="IVA Comisión"/>
@@ -313,7 +313,7 @@
         </field>
     </record>
     <record model="ir.actions.act_window" id="action_account_credit_card_liquidation_tree_view">
-        <field name="name">Credit Card Liquidation</field>
+        <field name="name">Liquidaciones TC</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">account.credit.card.liquidation</field>
         <field name="view_mode">tree,form</field>

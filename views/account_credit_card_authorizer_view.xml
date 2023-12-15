@@ -53,7 +53,7 @@
         <field name="view_mode">tree,form</field>
     </record>
     <menuitem
-            name="Authorizer"
+            name="Autorizadores"
             id="account_credit_card_authorizer_menu"
             parent="account_credit_card_main_menu"
             action="account_credit_card_authorizer_act_window"

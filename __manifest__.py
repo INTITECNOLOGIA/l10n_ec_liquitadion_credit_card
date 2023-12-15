@@ -14,6 +14,7 @@
         "data/payment_method_data.xml",
         "data/sequence_data.xml",
         "views/menu_root.xml",
+        "views/res_config_settings_views.xml",
         "views/account_credit_card_authorizer_view.xml",
         "views/payment_view.xml",
         "views/recap_view.xml",

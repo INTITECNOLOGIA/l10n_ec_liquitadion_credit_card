@@ -316,7 +316,7 @@ msgstr "Tarjeta de crédito"
 #: model:ir.model.fields,field_description:l10n_ec_liquitadion_credit_card.field_account_payment__l10n_ec_authorization_cc
 #: model:ir.model.fields,field_description:l10n_ec_liquitadion_credit_card.field_account_payment_register__l10n_ec_authorization_cc
 msgid "Credit Card Authorization Number"
-msgstr "Número de autorización de tarjeta de crédito"
+msgstr "Número de autorización de TC"
 
 #. module: l10n_ec_liquitadion_credit_card
 #: model:ir.actions.act_window,name:l10n_ec_liquitadion_credit_card.account_credit_card_authorizer_act_window
@@ -327,13 +327,13 @@ msgstr "Autorizador de tarjetas de crédito"
 #: model:ir.model.fields,field_description:l10n_ec_liquitadion_credit_card.field_account_payment__l10n_ec_credit_card_bank_id
 #: model:ir.model.fields,field_description:l10n_ec_liquitadion_credit_card.field_account_payment_register__l10n_ec_credit_card_bank_id
 msgid "Credit Card Bank Issuer"
-msgstr "Emisor del banco de tarjetas de crédito"
+msgstr "Emisor del banco de TC"
 
 #. module: l10n_ec_liquitadion_credit_card
 #: model:ir.model.fields,field_description:l10n_ec_liquitadion_credit_card.field_account_payment__l10n_ec_issuer_id
 #: model:ir.model.fields,field_description:l10n_ec_liquitadion_credit_card.field_account_payment_register__l10n_ec_issuer_id
 msgid "Credit Card Issuer"
-msgstr "Emisor de tarjeta de crédito"
+msgstr "Emisor de TC"
 
 #. module: l10n_ec_liquitadion_credit_card
 #: model:ir.actions.act_window,name:l10n_ec_liquitadion_credit_card.action_account_credit_card_liquidation_tree_view

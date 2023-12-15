@@ -37,11 +37,11 @@
                             options="{'no_create': True}"
                             attrs="{'invisible': [('is_payment_tc', '=', False)], 'required': [('is_payment_tc', '=', True)]}"
                     />
-                    <field
-                            name="l10n_ec_credit_card_bank_id"
-                            options="{'no_create': True}"
-                            attrs="{'invisible': [('is_payment_tc', '=', False)], 'required': [('is_payment_tc', '=', True)]}"
-                    />
+<!--                    <field-->
+<!--                            name="l10n_ec_credit_card_bank_id"-->
+<!--                            options="{'no_create': True}"-->
+<!--                            attrs="{'invisible': [('is_payment_tc', '=', False)], 'required': [('is_payment_tc', '=', True)]}"-->
+<!--                    />-->
 <!--                    <field-->
 <!--                            name="l10n_ec_voucher_type"-->
 <!--                            attrs="{'invisible': [('is_payment_tc', '=', False)], 'required': [('is_payment_tc', '=', True)]}"-->
@@ -89,11 +89,11 @@
                             options="{'no_create': True}"
                             attrs="{'invisible': [('is_payment_tc', '=', False)], 'required': [('is_payment_tc', '=', True)]}"
                     />
-                    <field
-                            name="l10n_ec_credit_card_bank_id"
-                            options="{'no_create': True}"
-                            attrs="{'invisible': [('is_payment_tc', '=', False)], 'required': [('is_payment_tc', '=', True)]}"
-                    />
+<!--                    <field-->
+<!--                            name="l10n_ec_credit_card_bank_id"-->
+<!--                            options="{'no_create': True}"-->
+<!--                            attrs="{'invisible': [('is_payment_tc', '=', False)], 'required': [('is_payment_tc', '=', True)]}"-->
+<!--                    />-->
 <!--                    <field-->
 <!--                            name="l10n_ec_voucher_type"-->
 <!--                            attrs="{'invisible': [('is_payment_tc', '=', False)], 'required': [('is_payment_tc', '=', True)]}"-->

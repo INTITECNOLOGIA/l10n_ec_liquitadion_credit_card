@@ -4,6 +4,5 @@
             name="Credit Card"
             id="account_credit_card_main_menu"
             parent="account.menu_finance_entries"
-
             sequence="135"/>
 </odoo>

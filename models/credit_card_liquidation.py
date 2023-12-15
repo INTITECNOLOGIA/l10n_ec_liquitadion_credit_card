@@ -122,8 +122,11 @@ class AccountCreditCardLiquidation(models.Model):
     percentage_ret_rent = fields.Float(
         string="Rent Withhold Percent", states=_STATES_DOC, default=2
     )
-    tax_id_ret = fields.Many2one('account.tax', string='Income Tax')
-    tax_id_vat = fields.Many2one('account.tax', string='VAT')
+
+    tax_id_ret = fields.Many2one('account.tax', string='Income Tax',
+                                 default=lambda self: self.env.user.company_id.tax_id_ret_liquidation.id)
+    tax_id_vat = fields.Many2one('account.tax', string='VAT',
+                                 default=lambda self: self.env.user.company_id.tax_id_vat_liquidation.id)
     commission_wo_invoice = fields.Float(
         string="Commission without Invoice", states=_STATES_DOC
     )

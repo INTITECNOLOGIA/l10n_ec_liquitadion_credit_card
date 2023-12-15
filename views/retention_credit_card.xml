@@ -53,7 +53,7 @@
             name="Retenciones TC"
             parent="account_credit_card_main_menu"
             action="l10n_ec_withhold_credit_card_tree_view"
-            sequence="20"/>
+            sequence="21"/>
 
     <record id="l10n_ec_withhold_line_credit_card_action" model="ir.actions.act_window">
         <field name="name">Lineas Retención Tarjeta Crédito</field>
@@ -68,5 +68,5 @@
             name="Lineas Retenciones TC"
             parent="account_credit_card_main_menu"
             action="l10n_ec_withhold_line_credit_card_action"
-            sequence="21"/>
+            sequence="22"/>
 </odoo>

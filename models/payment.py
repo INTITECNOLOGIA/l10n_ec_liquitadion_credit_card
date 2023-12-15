@@ -79,7 +79,7 @@ class AccountPaymentRecap(models.Model):
     #     related="printer_id.agency_id",
     #     store=True,
     # )
-    bank_id = fields.Many2one("res.bank", "Bank", readonly=True, ondelete="restrict")
+    journal_id = fields.Many2one("account.journal", "Diario", readonly=True, ondelete="restrict")
     amount_total = fields.Float(
         string="Total Amount",
         compute="_compute_amounts",
@@ -119,7 +119,7 @@ class AccountPaymentRecap(models.Model):
     _sql_constraints = [
         (
             "name_uniq",
-            "unique(name, bank_id, company_id)",
+            "unique(name, journal_id, company_id)",
             _(
                 "The number of Batch/RECAP must be unique by bank, "
                 "there's another with the same number, please check!"
@@ -133,7 +133,7 @@ class AccountPaymentRecap(models.Model):
         if name:
             recs = self.search([("name", "ilike", name)] + args, limit=limit)
         if not recs:
-            recs = self.search([("bank_id", "ilike", name)] + args, limit=limit)
+            recs = self.search([("journal_id", "ilike", name)] + args, limit=limit)
         if not recs:
             recs = self.search([("authorizer_id", "ilike", name)] + args, limit=limit)
         if not recs:
@@ -145,7 +145,7 @@ class AccountPaymentRecap(models.Model):
     def name_get(self):
         res = []
         for rec in self:
-            name = "{} - {}".format(rec.name, rec.bank_id.name)
+            name = "{} - {}".format(rec.name, rec.journal_id.name)
             res.append((rec.id, name))
         return res
 
@@ -228,7 +228,7 @@ class AccountPaymentRegister(models.TransientModel):
         payment_vals['l10n_ec_authorization_cc'] = self.l10n_ec_authorization_cc
         payment_vals['l10n_ec_authorizer_id'] = self.l10n_ec_authorizer_id.id
         payment_vals['l10n_ec_issuer_id'] = self.l10n_ec_issuer_id.id
-        payment_vals['l10n_ec_credit_card_bank_id'] = self.l10n_ec_credit_card_bank_id.id
+        #payment_vals['l10n_ec_credit_card_bank_id'] = self.l10n_ec_credit_card_bank_id.id
         payment_vals['l10n_ec_voucher_type'] = self.l10n_ec_voucher_type
         payment_vals['l10n_ec_voucher_number'] = self.l10n_ec_voucher_number
         payment_vals['l10n_ec_voucher_batch_number'] = self.l10n_ec_voucher_batch_number
@@ -313,7 +313,7 @@ class AccountPayment(models.Model):
                 recap = recap_model.search(
                     [
                         ("name", "=", batch),
-                        ("bank_id", "=", payment.l10n_ec_credit_card_bank_id.id),
+                        ("journal_id", "=", payment.journal_id.id),
                         ("state", "!=", "cancel"),
                     ],
                     limit=1,
@@ -333,7 +333,7 @@ class AccountPayment(models.Model):
         return {
             "company_id": self.company_id.id,
             "name": batch,
-            "bank_id": self.l10n_ec_credit_card_bank_id.id,
+            "journal_id": self.journal_id.id,
             "date": self.date,
             "authorizer_id": self.l10n_ec_authorizer_id.id,
             "state": "draft",
